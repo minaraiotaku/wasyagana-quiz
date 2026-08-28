@@ -1,0 +1,4063 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>わしゃがなTV4択クイズ</title>
+<meta name="description" content="「わしゃがなTV」の各回から出題する非公式4択クイズ。FILE001〜070収録、あなたは何問正解できる？">
+<meta property="og:type" content="website">
+<meta property="og:title" content="わしゃがなTV4択クイズ">
+<meta property="og:description" content="「わしゃがなTV」の各回から出題する非公式4択クイズ。FILE001〜070収録、あなたは何問正解できる？">
+<meta property="og:url" content="https://claude.ai/code/artifact/dd332956-6b94-4797-9479-a8d8265aca88">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="わしゃがなTV4択クイズ">
+<meta name="twitter:description" content="「わしゃがなTV」の各回から出題する非公式4択クイズ。あなたは何問正解できる？">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #10131c;
+    --bg-deep: #0a0c13;
+    --panel: #171c29;
+    --panel-alt: #1e2536;
+    --line: rgba(170, 190, 225, 0.24);
+    --line-soft: rgba(170, 190, 225, 0.13);
+    --accent: #e8963a;
+    --accent-soft: rgba(232, 150, 58, 0.16);
+    --accent-strong: #ffb35c;
+    --cyan: #3ecfc0;
+    --cyan-soft: rgba(62, 207, 192, 0.14);
+    --text: #f4f6fa;
+    --text-muted: #aab2c8;
+    --text-faint: #757ea0;
+    --good: #5fd97a;
+    --good-soft: rgba(95, 217, 122, 0.14);
+    --bad: #ff6b6b;
+    --bad-soft: rgba(255, 107, 107, 0.14);
+    --font-display: 'DotGothic16', 'MS Gothic', 'Hiragino Kaku Gothic ProN', monospace;
+    --font-body: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    --cut: 14px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(232, 150, 58, 0.08), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 100%, rgba(62, 207, 192, 0.06), transparent 60%),
+      var(--bg-deep);
+    color: var(--text);
+    font-family: var(--font-body);
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px 64px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode: overlay;
+    z-index: 1;
+  }
+
+  .stage { width: 100%; max-width: 640px; position: relative; z-index: 2; }
+
+  .frame {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
+    border: 1px solid var(--line);
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+    padding: 30px 30px 26px;
+    position: relative;
+  }
+  .frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-top: 2px solid var(--accent);
+    clip-path: polygon(0 0, var(--cut) 0, 0 var(--cut));
+    opacity: 0.9;
+  }
+
+  /* app header */
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    gap: 12px;
+  }
+  .app-logo {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .app-logo .mark {
+    width: 9px; height: 9px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    flex: none;
+  }
+  .app-logo h1 {
+    font-family: var(--font-display);
+    font-size: 21px;
+    letter-spacing: 0.06em;
+    margin: 0;
+    color: var(--text);
+  }
+  .back-btn {
+    all: unset;
+    box-sizing: border-box;
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    border: 1px solid var(--line);
+    padding: 8px 15px;
+    cursor: pointer;
+    clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px);
+    display: none;
+  }
+  .back-btn.show { display: inline-block; }
+  .back-btn:hover { border-color: var(--cyan); color: var(--text); }
+  .back-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+  /* home / archive list */
+  .archive-lede {
+    color: var(--text-muted);
+    font-size: 15.5px;
+    line-height: 1.75;
+    margin: 0 0 24px;
+    max-width: 60ch;
+  }
+  .archive-lede b { color: var(--text); font-weight: 700; }
+
+  .ep-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin-bottom: 4px; }
+
+  .pager { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 18px; }
+  .pager-btn {
+    all: unset;
+    box-sizing: border-box;
+    font-family: var(--font-display);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    padding: 7px 12px;
+    border: 1px solid var(--line);
+    color: var(--text-muted);
+    background: var(--panel-alt);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+  .pager-btn:hover { border-color: var(--cyan); color: var(--text); }
+  .pager-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .pager-btn.active { border-color: var(--accent); color: var(--accent-strong); background: var(--accent-soft); }
+  .pager-arrow { font-family: var(--font-body); font-weight: 700; padding: 7px 14px; }
+  .pager-btn:disabled { opacity: 0.35; cursor: default; }
+  .pager-btn:disabled:hover { border-color: var(--line); color: var(--text-muted); }
+
+  .ep-card {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    background: var(--panel-alt);
+    border: 1px solid var(--line);
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+    padding: 18px 20px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+  .ep-card:hover { border-color: var(--accent); background: #232b40; }
+  .ep-card:active { transform: scale(0.995); }
+  .ep-card:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .ep-card.locked { cursor: default; opacity: 0.5; }
+  .ep-card.locked:hover { border-color: var(--line); background: var(--panel-alt); }
+
+  .ep-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    gap: 10px;
+  }
+  .ep-num {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--cyan);
+    letter-spacing: 0.08em;
+  }
+  .ep-badge {
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border: 1px solid var(--accent);
+    color: var(--accent-strong);
+  }
+  .ep-badge.locked { border-color: var(--text-faint); color: var(--text-faint); }
+
+  .ep-title { font-size: 16.5px; font-weight: 700; line-height: 1.5; margin: 0 0 7px; text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; }
+  .ep-blurb { font-size: 13.5px; line-height: 1.6; color: var(--text-muted); margin: 0; }
+
+  .ep-card-body { display: flex; gap: 14px; align-items: flex-start; }
+  .ep-card-text { flex: 1; min-width: 0; }
+
+  .quiz-title-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 18px; }
+  .quiz-title-text { flex: 1; min-width: 0; }
+
+  /* quiz view */
+  .gauge { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 26px; }
+  .gauge i { height: 7px; background: var(--line-soft); display: block; transition: background 0.4s ease, box-shadow 0.4s ease; }
+  .gauge i.done { background: var(--accent); box-shadow: 0 0 6px var(--accent-soft); }
+  .gauge i.current { background: var(--cyan); box-shadow: 0 0 8px var(--cyan-soft); animation: pulse 1.6s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .gauge i.current { animation: none; } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  .quiz-eyebrow {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--accent-strong);
+    margin-bottom: 7px;
+  }
+  .quiz-title { font-family: var(--font-body); font-weight: 900; font-size: 19px; line-height: 1.55; letter-spacing: 0.01em; margin: 0; text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; }
+
+  .q-tag { font-family: var(--font-display); font-size: 14px; color: var(--cyan); letter-spacing: 0.08em; margin-bottom: 12px; }
+  .q-tag span { color: var(--text-faint); }
+  .q-text { font-size: 21px; line-height: 1.5; font-weight: 700; margin: 0 0 24px; text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; }
+
+  .choices { display: grid; gap: 12px; margin-bottom: 6px; }
+  .choice {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--panel-alt);
+    border: 1px solid var(--line);
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 16.5px;
+    line-height: 1.5;
+    color: var(--text);
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+  .choice:hover { border-color: var(--accent); background: #232b40; }
+  .choice:active { transform: scale(0.99); }
+  .choice:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .choice .mark { font-family: var(--font-display); font-size: 14.5px; color: var(--text-faint); width: 22px; flex: none; }
+  .choice.correct { border-color: var(--good); background: var(--good-soft); }
+  .choice.correct .mark { color: var(--good); }
+  .choice.wrong { border-color: var(--bad); background: var(--bad-soft); }
+  .choice.wrong .mark { color: var(--bad); }
+  .choice.disabled { cursor: default; }
+  .choice.dim { opacity: 0.45; }
+
+  .result-icon { margin-left: auto; font-family: var(--font-display); font-size: 14px; flex: none; }
+  .choice.correct .result-icon { color: var(--good); }
+  .choice.wrong .result-icon { color: var(--bad); }
+
+  .explain {
+    margin-top: 18px;
+    padding: 16px 18px;
+    background: var(--bg-deep);
+    border-left: 2px solid var(--cyan);
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    display: none;
+  }
+  .explain.show { display: block; animation: fadein 0.3s ease; }
+  .explain .label { font-family: var(--font-display); color: var(--cyan); font-size: 13px; letter-spacing: 0.1em; display: block; margin-bottom: 8px; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .next-btn {
+    all: unset;
+    box-sizing: border-box;
+    margin-top: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 24px;
+    background: var(--accent);
+    color: #1a1305;
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, background 0.15s ease;
+  }
+  .next-btn.show { opacity: 1; pointer-events: auto; }
+  .next-btn:hover { background: var(--accent-strong); }
+  .next-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+  /* results */
+  .results { text-align: left; }
+  .rank-row { display: flex; align-items: baseline; gap: 18px; margin-bottom: 10px; }
+  .rank-badge { font-family: var(--font-display); font-size: 60px; color: var(--accent-strong); line-height: 1; text-shadow: 0 0 24px var(--accent-soft); }
+  .rank-score { font-family: var(--font-display); font-size: 16px; color: var(--text-muted); }
+  .rank-line { font-size: 16.5px; line-height: 1.6; font-weight: 700; margin: 0 0 24px; }
+
+  .recap { display: grid; gap: 10px; margin-bottom: 28px; }
+  .recap-item { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; background: var(--panel-alt); border: 1px solid var(--line-soft); font-size: 14px; line-height: 1.6; color: var(--text-muted); }
+  .recap-item .r-mark { font-family: var(--font-display); flex: none; width: 16px; }
+  .recap-item.ok .r-mark { color: var(--good); }
+  .recap-item.ng .r-mark { color: var(--bad); }
+  .recap-item b { color: var(--text); font-weight: 700; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    all: unset;
+    box-sizing: border-box;
+    padding: 13px 22px;
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+  }
+  .btn-primary { background: var(--accent); color: #1a1305; }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--text-muted); }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--text); }
+  .btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+  .signoff {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-soft);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-faint);
+    letter-spacing: 0.02em;
+  }
+
+  noscript {
+    display: block;
+    max-width: 640px;
+    margin: 40px auto;
+    padding: 20px;
+    background: var(--panel);
+    border: 1px solid var(--bad);
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  /* responsive: tablet */
+  @media (max-width: 640px) {
+    body { padding: 28px 12px 56px; }
+    .frame { padding: 24px 20px 22px; }
+  }
+
+  /* responsive: phone */
+  @media (max-width: 420px) {
+    body { padding: 20px 8px 44px; }
+    .frame { padding: 20px 16px 18px; }
+    .app-logo h1 { font-size: 17px; }
+    .app-logo .mark { width: 7px; height: 7px; }
+    .back-btn { font-size: 11.5px; padding: 7px 11px; }
+    .archive-lede { font-size: 14px; }
+    .ep-title { font-size: 15px; }
+    .ep-blurb { font-size: 13px; }
+    .quiz-title { font-size: 17px; }
+    .q-text { font-size: 18px; }
+    .choice { padding: 13px 14px; font-size: 15px; gap: 10px; }
+    .rank-row { flex-wrap: wrap; row-gap: 4px; }
+    .rank-badge { font-size: 38px; }
+    .rank-line { font-size: 15px; }
+    .btn { padding: 12px 16px; font-size: 13.5px; }
+    .pager-btn { font-size: 11px; padding: 6px 9px; }
+  }
+
+  /* responsive: wide desktop */
+  @media (min-width: 900px) {
+    .stage { max-width: 720px; }
+  }
+</style>
+</head>
+<body>
+<noscript>
+  このアプリはJavaScriptで動作します。ブラウザ（Chrome、Safari、Edgeなど）でこのファイルを開き、JavaScriptを有効にしてください。プレビューアプリやメールの添付表示では正しく動作しません。
+</noscript>
+
+<div class="scanlines" aria-hidden="true"></div>
+<div class="stage">
+  <div class="frame">
+    <div class="app-header">
+      <div class="app-logo">
+        <span class="mark" aria-hidden="true"></span>
+        <h1>わしゃがなTV4択クイズ</h1>
+      </div>
+      <button class="back-btn" id="backBtn" type="button">◀ ARCHIVE</button>
+    </div>
+
+    <main id="app"></main>
+
+    <div class="signoff" id="signoff">
+      SOURCE: マフィア梶田と中村悠一の「わしゃがなTV」（@WasyaganaTV）／本アプリは非公式のファンクイズです
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+  const EPISODES = [
+    {
+      id: "kidou-tensei",
+      number: 1,
+      videoTitle: "【機動転生】賀東招二先生最新作発売記念！わしらが先生とぶっちゃけトーク！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=hWKHyJXBqqA",
+      blurb: "『フルメタル・パニック！』の賀東招二先生がゲスト出演。新作ライトノベル『機動転生』の発売を記念したPR回から出題。",
+      locked: false,
+      questions: [
+        {
+          q: "今回「わしゃがなTV」にゲストとして出演した作家は誰？",
+          choices: ["虚淵玄", "賀東招二", "奈須きのこ", "東出祐一郎"],
+          correct: 1,
+          explain: "正解は賀東招二先生。『フルメタル・パニック！』の原作者として知られ、今回は自身の新作発売を記念してわしゃがなTVに出演した。"
+        },
+        {
+          q: "賀東招二先生の最新作、動画タイトルにもなっているライトノベルのタイトルは？",
+          choices: ["機動戦記", "転生機兵", "機動転生", "蒼穹の機神"],
+          correct: 2,
+          explain: "正解は『機動転生』。ファンタジア文庫より2026年8月20日発売。イラストはBUNBUN、メカデザインは海老川兼武・渭原敏明が担当している。"
+        },
+        {
+          q: "『機動転生』で、事故死したサラリーマンが200年後の月面で転生する試作機動兵器の名前は？",
+          choices: ["アーバレスト", "ガーンズバック", "ラムダ・ドライバ", "レイダス"],
+          correct: 3,
+          explain: "正解は「レイダス」。目覚めるとその全高18mの試作機動兵器そのものになっており、高校生ジンを乗せて敵の機動兵器と戦うことになる。アーバレストは『フルメタル・パニック！』に登場する機体名なので注意。"
+        },
+        {
+          q: "『機動転生』のキャラクターイラストを担当しているのは誰？",
+          choices: ["四季童子", "BUNBUN", "海老川兼武", "渭原敏明"],
+          correct: 1,
+          explain: "正解はBUNBUN。海老川兼武・渭原敏明はメカデザイン担当で役割が異なる。四季童子は同時にPRされたスピンオフ『フルメタル・パニック！Family』のイラストを担当している。"
+        },
+        {
+          q: "この動画で『機動転生』と同時に発売記念PRされた、賀東招二先生による人気シリーズのスピンオフ作品は？",
+          choices: ["フルメタル・パニック！ふもっふ", "フルメタル・パニック！The Second Raid", "フルメタル・パニック！Invisible Victory", "フルメタル・パニック！Family"],
+          correct: 3,
+          explain: "正解は『フルメタル・パニック！Family』。動画では『機動転生』とあわせて、この最新スピンオフ作品も紹介されている。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "S", line: "完全適合。すでにレイダスのコクピットに座る資格がある。" },
+        { min: 4, badge: "A", line: "高適合。あと一歩で搭乗許可が下りるレベル。" },
+        { min: 3, badge: "B", line: "標準適合。訓練を積めば十分に戦えるパイロット候補。" },
+        { min: 1, badge: "C", line: "要再訓練。月面都市の情報をもう一度インプットせよ。" },
+        { min: 0, badge: "D", line: "地上勤務推奨。まずは元動画をチェックしてから再検査を。" }
+      ]
+    },
+    {
+      id: "ddr-classic-mini",
+      number: 2,
+      videoTitle: "【DDR】ミニミニ筐体からミラーボールの輝き！ダンレボクラシックミニで踊り明かせ！【私物紹介】",
+      videoUrl: "https://www.youtube.com/watch?v=yuYf_Agnm0E",
+      blurb: "本編で開封したドラクエ・MOTHER2グッズもそこそこに、倉庫に眠っていたクラウドファンディング品「ダンスダンスレボリューション クラシックミニ」がついに開封される回。",
+      locked: false,
+      questions: [
+        {
+          q: "紹介された「ダンスダンスレボリューション クラシックミニ」は、もともとどんな方法で手に入れたもの？",
+          choices: ["ゲームセンターの景品", "クラウドファンディング", "メーカーからの提供品", "福袋の当たり"],
+          correct: 1,
+          explain: "正解はクラウドファンディング。支援してから届くまでかなり時間が経ち、倉庫の奥で存在を忘れていたと語られていた。"
+        },
+        {
+          q: "このミニチュア筐体のスケールは？",
+          choices: ["1/3スケール", "1/4スケール", "1/5スケール", "1/6スケール"],
+          correct: 2,
+          explain: "正解は1/5スケール。公式サイトの表記を確認して「思ったより小さくない」と話していた。"
+        },
+        {
+          q: "この筐体の電源はどうやって取る？",
+          choices: ["単三電池4本", "USB給電", "ボタン電池", "ソーラーパネル"],
+          correct: 1,
+          explain: "正解はUSB給電。ケーブルを底面から通して電源を取る仕様だった。"
+        },
+        {
+          q: "実際に遊べる曲を増やすために必要だった作業は？",
+          choices: ["専用アプリでBluetooth接続", "PCから曲データをUSB経由で転送するアップデート", "ゲームカートリッジの追加購入", "QRコードを読み込むだけ"],
+          correct: 1,
+          explain: "正解はPC経由のアップデート作業。USB Type-Cで接続し、PCに落とした曲データを転送する必要があると話していた。"
+        },
+        {
+          q: "この筐体が再現しているのは、ゲームセンターで見た標準的な筐体タイプ。それは何と呼ばれる？",
+          choices: ["デラックス筐体", "スーパー筐体", "トーナメント筐体", "プレミアム筐体"],
+          correct: 1,
+          explain: "正解はスーパー筐体。「いわゆる標準的筐体」と紹介されていた、シリーズで最もメジャーなタイプ。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "CHALLENGE", line: "全曲パーフェクトの伝説的プレイヤー。筐体の光にも負けない輝き。" },
+        { min: 4, badge: "EXPERT", line: "かなりの手練れ。あと少しで伝説入り。" },
+        { min: 3, badge: "DIFFICULT", line: "標準以上の実力。足も記憶も悪くない。" },
+        { min: 1, badge: "BASIC", line: "まだまだ練習中。まずは基本のステップから。" },
+        { min: 0, badge: "BEGINNER", line: "筐体の前で立ち尽くすレベル。まずは動画を見直そう。" }
+      ]
+    },
+    {
+      id: "kyarapu-pr",
+      number: 3,
+      videoTitle: "【キャラぷ】テンプレブレイク系男子&デスゲーム破りの漢登場！？ 予測不可能なロールプレイチャットしてみた【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=rH2SfcpXa_8",
+      blurb: "AIチャットアプリ『キャラぷ』の提供回。うさぎのマスクをかぶったデスゲームの主催者に挑む、予測不可能なロールプレイの模様。",
+      locked: false,
+      questions: [
+        {
+          q: "今回紹介されたAIチャットアプリの名前は？",
+          choices: ["キャラクエ", "キャラぷ", "トークル", "なりチャット"],
+          correct: 1,
+          explain: "正解は「キャラぷ」。プレイヤーの回答次第で物語の展開が変わるチャット型シミュレーションアプリ。"
+        },
+        {
+          q: "「キャラぷ」を開発している企業は？",
+          choices: ["Wrtn Technologies", "KADOKAWA", "DeNA", "Cygames"],
+          correct: 0,
+          explain: "正解はWrtn Technologies。2025年6月にリリースされたAIキャラチャットサービス。"
+        },
+        {
+          q: "マフィア梶田が挑んだシナリオで、デスゲームの主催者（うさぎのマスクをかぶったキャラクター）の名前は？",
+          choices: ["あおい", "つばき", "すみれ", "ゆきの"],
+          correct: 0,
+          explain: "正解は「あおい」。マフィアに一目惚れし、好感度がいきなり跳ね上がるという展開になった。"
+        },
+        {
+          q: "このシナリオでマフィア梶田がやらかした、会場内をざわつかせた行動は？",
+          choices: ["主催者に反抗してゲームを放棄した", "自分のLINEアカウントを参加者全員に教えてしまった", "ルールを無視してうさぎのマスクを奪った", "デスゲームだと気づかず観光気分で参加した"],
+          correct: 1,
+          explain: "正解は「LINEを参加者全員に教えてしまった」。あおい限定のつもりが全員に広まり、警戒度が急上昇する事態に。"
+        },
+        {
+          q: "古畑任三郎談義をひとしきり終えた中村悠一（役）は、何と言って椅子から立ち上がった？",
+          choices: ["俺の11周目はお前と見ようかな", "お前も古畑沼に落ちればいい", "続きはまた今度話そう", "もう椅子はやめて、隣に座らないか"],
+          correct: 0,
+          explain: "正解は「俺の11周目はお前と見ようかな」。テンプレ破壊のつもりで放った「古畑任三郎を見た」という発言がまさかの共通の趣味だったことが判明し、二人で「何周観たか」を語り合った末に飛び出した殺し文句。AIキャラはこの一言で完全に落ちてしまった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "本命", line: "好感度MAX。ゲームマスターも思わず一目惚れ。" },
+        { min: 4, badge: "お気に入り", line: "あと一歩で本命入り。" },
+        { min: 3, badge: "顔見知り", line: "及第点の好感度。" },
+        { min: 1, badge: "警戒対象", line: "好感度より警戒度が上がってしまったかも。" },
+        { min: 0, badge: "敵認定", line: "これは……周囲から距離を置かれるやつ。" }
+      ]
+    },
+    {
+      id: "dragonball-box",
+      number: 4,
+      videoTitle: "【ドラゴンボール】豪華ジャンプ漫画家大集合な全巻BOXをボマーに気をつけながら開封！【HUNTER×HUNTER】",
+      videoUrl: "https://www.youtube.com/watch?v=LY3L6iVBbfE",
+      blurb: "連載40周年記念『DRAGON BALL 全42巻セット Double Cover Box』を、ボマーに気をつけながら開封する回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回開封したコレクションアイテムは？",
+          choices: ["ドラゴンボール全42巻セット ダブルカバーボックス", "ドラゴンボール超 全巻収納ケース", "ドラゴンボールZ 名場面イラスト集", "ドラゴンボール 直筆サイン本セット"],
+          correct: 0,
+          explain: "正解は連載40周年記念『DRAGON BALL 全42巻セット Double Cover Box』。"
+        },
+        {
+          q: "このBOXの最大の特徴は？",
+          choices: ["全巻に鳥山明のサインが入っている", "元の表紙の上に豪華作家陣の描き下ろしカバーが巻かれるダブルカバー仕様", "電子書籍のシリアルコードが付属する", "表紙が1枚の絵でつながる仕様のみ"],
+          correct: 1,
+          explain: "正解はダブルカバー仕様。オリジナル表紙の上に、42人の豪華作家陣が描き下ろした新規カバーが巻かれている。"
+        },
+        {
+          q: "動画タイトルにも入っている、カバーを手掛けた作家の一人は？",
+          choices: ["冨樫義博（HUNTER×HUNTER）", "久保帯人（BLEACH）", "岸本斉史（NARUTO）", "和月伸宏（るろうに剣心）"],
+          correct: 0,
+          explain: "正解は冨樫義博。動画タイトルに『HUNTER×HUNTER』の名前が入っているのはこのため。"
+        },
+        {
+          q: "動画内で話題になった、このBOXのカバーも手掛けた『ジョジョの奇妙な冒険』の作者は？",
+          choices: ["荒木飛呂彦", "尾田栄一郎", "藤本タツキ", "芥見下々"],
+          correct: 0,
+          explain: "正解は荒木飛呂彦。「荒木先生がポーズをつけるとこうなるんだな」と、キャラのポージングの独特さで盛り上がっていた。"
+        },
+        {
+          q: "動画タイトルの「ボマー」は何に由来するフレーズ？",
+          choices: ["「HUNTER×HUNTER」に登場するキャラクターの名前", "爆弾処理班を意味する英語", "荷物を運ぶ配達員のあだ名", "ドラゴンボールに登場するモブキャラの名前"],
+          correct: 0,
+          explain: "正解は『HUNTER×HUNTER』のキャラクター名。開封中にかけていた特製メガネの形が似ていることから話題になった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "戦闘力53万", line: "フリーザ級の完全制覇。" },
+        { min: 4, badge: "戦闘力18万", line: "ベジータ級の実力者。" },
+        { min: 3, badge: "戦闘力1万", line: "リクーム級、十分強い。" },
+        { min: 1, badge: "戦闘力5", line: "ヤムチャ級……出直してこよう。" },
+        { min: 0, badge: "戦闘力バグって計測不能", line: "スカウターが壊れるレベル。" }
+      ]
+    },
+    {
+      id: "shield-d-prime",
+      number: 5,
+      videoTitle: "【SHIELD-D-PRIME】トランスフォーマー×ゾイド×ダイアクロン＝最強！【私物紹介】",
+      videoUrl: "https://www.youtube.com/watch?v=9lHkmkWS5KQ",
+      blurb: "予約から1年越しにようやく到着した3ブランドコラボ『SHIELD-D-PRIME』を開封する回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回紹介された「SHIELD-D-PRIME」は、どの3ブランドのコラボ商品？",
+          choices: ["ガンダム×マクロス×パトレイバー", "トランスフォーマー×ゾイド×ダイアクロン", "戦隊×ライダー×ウルトラマン", "ダイアクロン×マイクロマン×コンバトラー"],
+          correct: 1,
+          explain: "正解はトランスフォーマー×ゾイド×ダイアクロンの3ブランドコラボ。"
+        },
+        {
+          q: "SHIELD-D-PRIMEが変形する2つのモードは？",
+          choices: ["シールドライガーモードとオプティマスプライムモード", "コンボイモードとゴジュラスモード", "ブレイブモードとキングモード", "ジェノザウラーモードとバンブルビーモード"],
+          correct: 0,
+          explain: "正解はシールドライガーモードとオプティマスプライムモード。ゾイドの名機がトランスフォーマーの顔・オプティマスプライムへと変形する。"
+        },
+        {
+          q: "このシリーズが展開されているブランド名は？",
+          choices: ["T-SPARK", "DX超合金", "プラモウォーズ", "METAL BUILD"],
+          correct: 0,
+          explain: "正解はT-SPARK。タカラトミーが展開する、複数のロボットIPを掛け合わせるブランド。"
+        },
+        {
+          q: "動画内で話題になった、コックピットに搭乗させられるフィギュアは？",
+          choices: ["ダイアクロン隊員", "ミクロマン", "S.H.フィギュアーツ", "トランスフォーマーのスパークマン"],
+          correct: 0,
+          explain: "正解はダイアクロン隊員。ダイアクロン規格のハードポイントで搭乗・換装ができる作りになっている。"
+        },
+        {
+          q: "動画内で「長年センターポジション」と語られていた、モチーフになった旧ゾイドシリーズの人気メカは？",
+          choices: ["ゴジュラス", "シールドライガー", "ジェノザウルス", "コマンドウルフ"],
+          correct: 1,
+          explain: "正解はシールドライガー。「昔からセンターなんじゃないですかね」と話題になっていた、シリーズを象徴する機体。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "完全変形", line: "シールドライガーからオプティマスプライムまで完璧に把握。" },
+        { min: 4, badge: "準備完了", line: "あと一歩で完全変形。" },
+        { min: 3, badge: "稼働良好", line: "基本性能はしっかり理解。" },
+        { min: 1, badge: "要組み立て直し", line: "まだパーツが余ってる状態。" },
+        { min: 0, badge: "輸送箱のまま", line: "開封すらできていないレベル。" }
+      ]
+    },
+    {
+      id: "kodak-charmera-d",
+      number: 6,
+      videoTitle: "【吸血鬼ハンターD】ちょっぴり高額デジカメブラインドボックス！&ガレキで再現！映画版D【KODAK CHARMERA キーチェーン】",
+      videoUrl: "https://www.youtube.com/watch?v=AxAGZWExr0g",
+      blurb: "デジカメ機能付きのレトロカメラ風ブラインドボックスと、吸血鬼ハンターDのガレージキットを紹介する私物回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回開封した「コダック風レトロカメラ」のブラインドボックス、1個あたりの価格は？",
+          choices: ["1,500円", "3,300円", "6,500円", "9,800円"],
+          correct: 2,
+          explain: "正解は6,500円。ただの飾りではなく、SDカードを入れれば実際に写真や動画が撮れる本物のデジカメだった。"
+        },
+        {
+          q: "このブラインドボックスの特徴として紹介されていたのは？",
+          choices: ["ただの飾り物でカメラ機能はない", "SDカードを入れれば実際に写真・動画が撮影できる", "単三電池で動く置き時計", "音楽が流れるオルゴール"],
+          correct: 1,
+          explain: "正解はSDカードを入れれば実際に写真・動画が撮影できる。使い切りカメラ風の見た目だが中身は本物のデジタルカメラだった。"
+        },
+        {
+          q: "このブラインドボックスには全部で何種類のシークレットがあると紹介されていた？",
+          choices: ["8種", "24種", "48種", "100種"],
+          correct: 2,
+          explain: "正解は48種。「シークレットありますから」と話題になっていた。"
+        },
+        {
+          q: "「吸血鬼ハンターD」のガレージキットは、どちらのビジュアルに寄せて塗装されたと話していた？",
+          choices: ["天野喜孝のイラスト版", "川尻善昭監督の映画版", "望月峯太郎版", "荒木飛呂彦版"],
+          correct: 1,
+          explain: "正解は川尻善昭監督の映画版。「髪の毛がウェブかかってるんで川尻版だよな」と話していた。"
+        },
+        {
+          q: "Dの左手に関する設定として話題になっていたのは？",
+          choices: ["常に手袋を外さない", "喋る相棒が宿っている", "実は義手である", "絵の具で塗られた飾り"],
+          correct: 1,
+          explain: "正解は喋る相棒が宿っている。「左手で喋るおじいさんという相棒」と紹介されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "SSSシークレット", line: "48分の1を引き当てる強運の持ち主。" },
+        { min: 4, badge: "SSレア", line: "かなりの当たり運。次も期待できる。" },
+        { min: 3, badge: "Sレア", line: "十分満足のいく結果。" },
+        { min: 1, badge: "ノーマル", line: "堅実な結果。次に賭けよう。" },
+        { min: 0, badge: "ハズレ枠", line: "残念、また挑戦してみよう。" }
+      ]
+    },
+    {
+      id: "koihime-taisen-pr",
+      number: 7,
+      videoTitle: "【恋姫†大戦】大変！梶田が凶封化しちゃった！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=umtwKRUNrEk",
+      blurb: "EXNOAの新作スマホゲーム『恋姫†大戦』PR回。ゲーム内バトルで梶田の「凶封化」を解くことに。",
+      locked: false,
+      questions: [
+        {
+          q: "今回PRされたスマホゲーム『恋姫†大戦』の配信元は？",
+          choices: ["EXNOA（DMM GAMES）", "Cygames", "DeNA", "Wrtn Technologies"],
+          correct: 0,
+          explain: "正解はEXNOA（DMM GAMES）。2026年2月5日にサービス開始した戦乱バトルRPG。"
+        },
+        {
+          q: "『恋姫†大戦』に登場するキャラクター数は？",
+          choices: ["約20名", "約40名", "60名以上", "100名以上"],
+          correct: 2,
+          explain: "正解は60名以上。歴代恋姫シリーズのキャラクターが全員集合する。"
+        },
+        {
+          q: "『恋姫†大戦』に登場する、動画内でも名前が挙がった歴史上の人物は？",
+          choices: ["織田信長", "徳川家康", "豊臣秀吉", "伊達政宗"],
+          correct: 0,
+          explain: "正解は織田信長。武田信玄なども美少女化して登場する。"
+        },
+        {
+          q: "動画内で梶田が「凶封化」してしまうというハプニングが発生したが、正常に戻すためにどうした？",
+          choices: ["ゲーム内で対戦して倒す", "お祓いを受けに行く", "一晩眠らせる", "甘いものを食べさせる"],
+          correct: 0,
+          explain: "正解はゲーム内で対戦して倒す。中村がゲームで対戦し、梶田を元に戻すという展開になった。"
+        },
+        {
+          q: "この動画は、同シリーズのPRとして何回目の登場だったか？",
+          choices: ["初回", "2回目", "5回目", "10回目"],
+          correct: 1,
+          explain: "正解は2回目。前回は今年の頭、リリース直前のタイミングだったと話していた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "完全浄化", line: "凶封の気配なし。完全に元の姿を保っている。" },
+        { min: 4, badge: "ほぼ正常", line: "軽い違和感はあるが問題なし。" },
+        { min: 3, badge: "軽度の凶封", line: "少しむずむずしてきたかもしれない。" },
+        { min: 1, badge: "重度の凶封", line: "だいぶ危険な状態。早めの対処を。" },
+        { min: 0, badge: "完全に堕ちた", line: "もう手遅れ。中村さんに対戦を頼もう。" }
+      ]
+    },
+    {
+      id: "wasyagana-cult-quiz",
+      number: 8,
+      videoTitle: "【クイズ】この時わしらは何言った！？ わしゃがなカルトクイズ！【振り返り】",
+      videoUrl: "https://www.youtube.com/watch?v=Mt_4zXq7Ai8",
+      blurb: "5年分の動画から出題される、わしゃがなTV自身による自分たちへのクイズ企画。",
+      locked: false,
+      questions: [
+        {
+          q: "振り返り企画で話題になった、当時ライバル視していたことが明かされたYouTuberは？",
+          choices: ["花江夏樹", "ヒカキン", "加藤純一", "はじめしゃちょー"],
+          correct: 0,
+          explain: "正解は花江夏樹。当時彼のYouTubeチャンネルが伸びていた時期で、動画タイトルにも意識が表れていたと話していた。"
+        },
+        {
+          q: "このチャンネルの動画は、この時点で何年分蓄積されていたと話していた？",
+          choices: ["2年分", "3年分", "5年分", "10年分"],
+          correct: 2,
+          explain: "正解は5年分。「5年分の動画が固まってる」と紹介されていた。"
+        },
+        {
+          q: "初期のスタジオについて話していた内容として正しいものは？",
+          choices: ["撮影スペースがテーブル1個分ほどしかなく、近くのケバブ屋の匂いが漂っていた", "音楽スタジオを間借りしていた", "屋外の公園で収録していた", "最新の広々としたスタジオだった"],
+          correct: 0,
+          explain: "正解はテーブル1個分ほどの極狭スタジオ。近くのケバブ屋の匂いが常に漂っていたと振り返っていた。"
+        },
+        {
+          q: "グッズ企画会議の回で、「ジターリング」と記憶違いしそうになっていた昔懐かしいおもちゃは？",
+          choices: ["レインボースプリング", "けん玉", "ダイヤブロック", "スーパーボール"],
+          correct: 0,
+          explain: "正解はレインボースプリング。階段を落ちていくバネのおもちゃで、指で弾く「ジターリング」と混同しかけていた。"
+        },
+        {
+          q: "グッズ企画会議で、たまごっちに近いものとして比較されていた「わしゃがなTV」オリジナル企画は？",
+          choices: ["わしゃごっち", "わしゃブロック", "わしゃすごろく", "わしゃカード"],
+          correct: 0,
+          explain: "正解は「わしゃごっち」。たまごっちのパロディ企画として提案されていたと振り返っていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "完全記憶", line: "自分の発言を一言一句覚えている記憶力の持ち主。" },
+        { min: 4, badge: "ほぼ覚えてる", line: "だいたいの流れは記憶に残っている。" },
+        { min: 3, badge: "うろ覚え", line: "言われれば思い出せるレベル。" },
+        { min: 1, badge: "ほぼ忘却", line: "ヒントがないと厳しい。" },
+        { min: 0, badge: "記憶喪失", line: "完全に忘れている。動画を見直そう。" }
+      ]
+    },
+    {
+      id: "wizardry-daphne-ff11",
+      number: 10,
+      videoTitle: "【Wizardry Variants Daphne】ズヴァール城の門が開かれる… ダフネFF11コラボ開催！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=lBSiQgDIp0c",
+      blurb: "45周年を迎えたウィザードリィシリーズ最新作、FF11とのまさかのコラボを紹介するPR回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回PRされた『ウィザードリィ ヴァリアンツ ダフネ』の配信元は？",
+          choices: ["ドリコム", "スクウェア・エニックス", "セガ", "バンダイナムコ"],
+          correct: 0,
+          explain: "正解はドリコム。今回で3回目の「ダフネ」PRだと紹介されていた。"
+        },
+        {
+          q: "今回の提供のきっかけとなった、発表されたコラボ先は？",
+          choices: ["ファイナルファンタジーXI", "ドラゴンクエスト", "モンスターハンター", "ロマンシング サガ"],
+          correct: 0,
+          explain: "正解はファイナルファンタジーXI。ケットシーのビジュアルとのコラボが話題になっていた。"
+        },
+        {
+          q: "ウィザードリィシリーズは今年で何周年を迎えると紹介されていた？",
+          choices: ["35周年", "40周年", "45周年", "50周年"],
+          correct: 2,
+          explain: "正解は45周年。シリーズ最新作としての『ダフネ』が紹介されていた。"
+        },
+        {
+          q: "『ダフネ』のパーティー編成人数の上限は？",
+          choices: ["最大4人", "最大6人", "最大8人", "最大12人"],
+          correct: 1,
+          explain: "正解は最大6人。3DダンジョンRPGとして紹介されていた。"
+        },
+        {
+          q: "この動画は、同シリーズのPRとして何回目の登場だったか？",
+          choices: ["初回", "2回目", "3回目", "5回目"],
+          correct: 2,
+          explain: "正解は3回目。「ありがとうございます、3回目のダフネでございます」と話していた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "伝説の勇者", line: "ダンジョンを完全制覇。ズヴァール城も恐れるに足らず。" },
+        { min: 4, badge: "ベテラン冒険者", line: "経験を積んだ頼れる存在。" },
+        { min: 3, badge: "見習い冒険者", line: "基本はしっかり押さえている。" },
+        { min: 1, badge: "迷子の新人", line: "まだダンジョンの入り口をうろうろ中。" },
+        { min: 0, badge: "早々に全滅", line: "レベル上げからやり直そう。" }
+      ]
+    },
+    {
+      id: "ikebukuro-shabuyo",
+      number: 11,
+      videoTitle: "【わしら、池袋で遊ぶ③】遊んだあとはしゃぶしゃぶ食べ放題！「しゃぶ葉」でお腹いっぱい食事してきた【晩ご飯編】",
+      videoUrl: "https://www.youtube.com/watch?v=hJAYDR7ojDY",
+      blurb: "バンダイナムコ Cross Store遊びの後は、しゃぶ葉でお腹いっぱい晩ご飯回。",
+      locked: false,
+      questions: [
+        {
+          q: "このロケで訪れたしゃぶしゃぶ食べ放題のお店は？",
+          choices: ["しゃぶ葉", "温野菜", "どん亭", "しゃぶしゃぶ木曽路"],
+          correct: 0,
+          explain: "正解はしゃぶ葉。池袋の店舗を訪れていた。"
+        },
+        {
+          q: "残念ながら少し前に終了していたと話していたコラボは？",
+          choices: ["安本竜二とのコラボ", "中村悠一とのコラボ", "プロレスラーとのコラボ", "アニメとのコラボ"],
+          correct: 0,
+          explain: "正解は安本竜二とのコラボ。「あれで行きたかったな」と残念がっていた。"
+        },
+        {
+          q: "動画内で話していた、しゃぶ葉の寿司の感想は？",
+          choices: ["スーパーで売っているお寿司ぐらいのクオリティ", "高級寿司店に匹敵する味", "冷凍臭くて食べられない", "メニューに存在しない"],
+          correct: 0,
+          explain: "正解はスーパーで売っているお寿司ぐらいのクオリティ。「普通に美味しい」と話していた。"
+        },
+        {
+          q: "豚肉を選ぶ際、トレーニング的におすすめと話していた部位は？",
+          choices: ["肩ロース", "バラ肉", "ヒレ肉", "豚トロ"],
+          correct: 0,
+          explain: "正解は肩ロース。「トレーナーに肩ロースを食べてくださいと言われた」と話していた。"
+        },
+        {
+          q: "マグロについて「医者に言われた」と話していたジンクスは？",
+          choices: ["仕事前日でも食あたりしない安全な食材", "食べ過ぎると太りやすい", "アレルギーの原因になりやすい", "消化に時間がかかる"],
+          correct: 0,
+          explain: "正解は仕事前日でも食あたりしない安全な食材。「マグロは絶対に食あたりしない」と医者に言われたと話していた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "満腹満足コース", line: "お腹も心も大満足の晩ご飯だった。" },
+        { min: 4, badge: "お腹いっぱい", line: "十分に食べて満足。" },
+        { min: 3, badge: "ちょうど良い", line: "腹八分目でいい塩梅。" },
+        { min: 1, badge: "小食", line: "もう少し食べられたかもしれない。" },
+        { min: 0, badge: "お腹すいてる", line: "この後もう一軒行きたいレベル。" }
+      ]
+    },
+    {
+      id: "basefood-pr",
+      number: 12,
+      videoTitle: "【BASE FOOD】ベースブレッド、アレンジしてみた。【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=LdUizNbkPYU",
+      blurb: "完全栄養食『BASE BREAD』の魅力を紹介するPR回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回紹介された完全栄養食「BASE BREAD」を販売する企業は？",
+          choices: ["BASE FOOD", "明治", "山崎製パン", "カルビー"],
+          correct: 0,
+          explain: "正解はBASE FOOD。完全栄養食のベースブレッドを紹介する回だった。"
+        },
+        {
+          q: "BASE BREAD 1食分（2袋）で摂れる栄養は？",
+          choices: ["1日に必要な栄養素の1/3", "1日に必要な栄養素の半分", "1日に必要な栄養素の全て", "1週間分のビタミンのみ"],
+          correct: 0,
+          explain: "正解は1日に必要な栄養素の1/3。26種のビタミン&ミネラル、約27gのタンパク質などが含まれる。"
+        },
+        {
+          q: "BASE BREADのフレーバーは何種類あると紹介されていた？",
+          choices: ["5種類", "8種類", "13種類", "20種類"],
+          correct: 2,
+          explain: "正解は13種類。チョコレートやメープル、カレー、ミルクなど多彩な味が用意されている。"
+        },
+        {
+          q: "BASE BREADの食物繊維量は、ご飯と比べてどのくらいと紹介されていた？",
+          choices: ["約0.5倍", "約1.4倍", "約3倍", "約5倍"],
+          correct: 1,
+          explain: "正解は約1.4倍。糖質は同種の食品に比べて約30%オフとも紹介されていた。"
+        },
+        {
+          q: "今回紹介された「定期便お得便」のセット内容は？",
+          choices: ["7袋（3.5食分）", "14袋（7食分）", "30袋（15食分）", "1袋のみ"],
+          correct: 1,
+          explain: "正解は14袋（7食分）。スキップやお届け日時の変更が可能な定期便として紹介されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "完全栄養", line: "33の栄養素をコンプリート。パーフェクトな理解度。" },
+        { min: 4, badge: "バランス良好", line: "だいたいの栄養は押さえている。" },
+        { min: 3, badge: "やや偏り気味", line: "基本は分かっているが少し抜けがある。" },
+        { min: 1, badge: "栄養不足", line: "もう一度パッケージを読み直そう。" },
+        { min: 0, badge: "欠食", line: "完全栄養食デビューからやり直し。" }
+      ]
+    },
+    {
+      id: "highschool-wars-timetable",
+      number: 13,
+      videoTitle: "【イベント直前企画】これがわしらの学校の時間割じゃい！【わしゃがな ハイスクールウォーズ！！】",
+      videoUrl: "https://www.youtube.com/watch?v=lZ9Gamwhhjc",
+      blurb: "夏のリアルイベント「わしゃがなハイスクールウォーズ」に向けて、オリジナル時間割を考える企画回。",
+      locked: false,
+      questions: [
+        {
+          q: "「わしゃがなハイスクール」の時間割で、数学の教材として最終的に決まったレトロゲームは？",
+          choices: ["ドンキーコングジュニアの算数遊び", "マリオといっしょ算数教室", "ポケモン学習ゲーム", "いっしょにトレーニング"],
+          correct: 0,
+          explain: "正解はドンキーコングジュニアの算数遊び。数学の担任にはアムロ・レイが選ばれていた。"
+        },
+        {
+          q: "数学の担任として選ばれたキャラクターは？",
+          choices: ["アムロ・レイ", "セーラームーン", "孫悟空", "うずまきナルト"],
+          correct: 0,
+          explain: "正解はアムロ・レイ。「数学の担任はアムロ・レイにしときましょう」と決まっていた。"
+        },
+        {
+          q: "英語の授業の教材として提案されたのは？",
+          choices: ["美少女戦士セーラームーン", "DRAGON BALL", "ドラえもん", "名探偵コナン"],
+          correct: 0,
+          explain: "正解は美少女戦士セーラームーン。セーラービーナスの必殺技「ビーナス・ラブ・ミー・チェーン」で英語を覚えようという話になっていた。"
+        },
+        {
+          q: "この企画は、何と関連づけて行われたと紹介されていた？",
+          choices: ["お正月にやった「わしゃがなおせち」を考える企画の再来", "忘年会企画", "エイプリルフール企画", "クリスマス特番"],
+          correct: 0,
+          explain: "正解はお正月の「わしゃがなおせち」企画の再来。同じ路線で高校の時間割を考える内容だった。"
+        },
+        {
+          q: "この時間割は、夏に行われる何のために作られたと紹介されていた？",
+          choices: ["リアルイベント「わしゃがなハイスクールウォーズ」", "新作アニメ制作", "グッズ展開", "舞台挨拶"],
+          correct: 0,
+          explain: "正解はリアルイベント「わしゃがなハイスクールウォーズ」。高校生活をテーマにしたイベントの一環として考えられた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "首席", line: "時間割を完璧に暗記。わしゃがなハイスクールのエース。" },
+        { min: 4, badge: "優等生", line: "しっかり授業内容を把握している。" },
+        { min: 3, badge: "平均点", line: "基本はまあまあ理解している。" },
+        { min: 1, badge: "赤点ギリギリ", line: "もう一度授業を受け直そう。" },
+        { min: 0, badge: "落第", line: "時間割から勉強し直しレベル。" }
+      ]
+    },
+    {
+      id: "ichibankuji-db-yyh",
+      number: 14,
+      videoTitle: "【一番くじ】ドラゴンボールに幽遊白書、そしてあのVTuberまで！ 一番くじを大量に開封！【わしら、池袋で遊ぶ 番外編②】",
+      videoUrl: "https://www.youtube.com/watch?v=6NMzTnYGtio",
+      blurb: "バンダイナムコ Cross Storeで手に入れた一番くじの戦利品を大量開封する回。",
+      locked: false,
+      questions: [
+        {
+          q: "この動画は、以前行った企画のどんな位置づけと紹介されていた？",
+          choices: ["バンダイナムコ Cross Store一番くじの後編", "完全新規の一番くじ企画", "視聴者プレゼント企画", "総集編"],
+          correct: 0,
+          explain: "正解はバンダイナムコ Cross Store一番くじの後編。前編に続く戦利品開封回として紹介されていた。"
+        },
+        {
+          q: "開封した一番くじに含まれていたアニメ作品は？",
+          choices: ["幽遊白書とドラゴンボール", "ワンピースとナルト", "呪術廻戦と鬼滅の刃", "スラムダンクとハイキュー"],
+          correct: 0,
+          explain: "正解は幽遊白書とドラゴンボール。両方の一番くじを開封していた。"
+        },
+        {
+          q: "一番くじで、最後のくじを引いた人がもらえる特別賞品は何と呼ばれる？",
+          choices: ["ラストワン賞", "スペシャル賞", "グランプリ賞", "ファイナル賞"],
+          correct: 0,
+          explain: "正解はラストワン賞。実際にこの動画内でラストワンを獲得していた。"
+        },
+        {
+          q: "幽遊白書のタオルに描かれていたのは、幽助のどの必殺技の柄だった？",
+          choices: ["霊丸", "覇王翔吼拳", "かめはめ波", "天津飯の気功砲"],
+          correct: 0,
+          explain: "正解は霊丸。幽助の代表的な必殺技の柄がデザインされていた。"
+        },
+        {
+          q: "ドラゴンボールの一番くじで「F賞」として紹介されていたグッズは？",
+          choices: ["巾着ポーチ", "マグカップ", "タオルセット", "アクリルスタンド"],
+          correct: 0,
+          explain: "正解は巾着ポーチ。大人になったブルマがデザインされたラバーグッズも話題になっていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "ラストワン賞", line: "最後のくじを引き当てる強運の持ち主。" },
+        { min: 4, badge: "A賞級", line: "上位賞クラスの当たり運。" },
+        { min: 3, badge: "B賞級", line: "十分満足な結果。" },
+        { min: 1, badge: "ノーマル賞", line: "堅実な結果。" },
+        { min: 0, badge: "ハズレ", line: "残念、また挑戦してみよう。" }
+      ]
+    },
+    {
+      id: "ikebukuro-loot-1",
+      number: 15,
+      videoTitle: "【一番くじ】歌川一門グッズに物申す！？ ロケで手に入れた戦利品を開封！【わしら、池袋で遊ぶ 番外編①】",
+      videoUrl: "https://www.youtube.com/watch?v=H1_vPSMgxD0",
+      blurb: "池袋ロケで手に入れた戦利品を開封する回。クレーンゲームの猛者っぷりが光る。",
+      locked: false,
+      questions: [
+        {
+          q: "クレーンゲームで獲得した『ジョジョの奇妙な冒険』のキャラクターのぬいぐるみは？",
+          choices: ["イギー", "ペットショップ", "スタープラチナ", "虹村億泰"],
+          correct: 0,
+          explain: "正解はイギー。「荒木先生って結構動物死なせるけど」と話題になっていた、ジョジョ第3部に登場する犬キャラクター。"
+        },
+        {
+          q: "このイギーのプライズを巡って発生したハプニングは？",
+          choices: ["梶田が挑戦して取れなかったものを、後からマネージャーが自腹でゲームをして取ってしまった", "中村が誤って割ってしまった", "景品センターに売り切れていた", "2つとも同じ景品が出て被った"],
+          correct: 0,
+          explain: "正解は梶田が挑戦して取れなかったものを、マネージャーが自腹でこっそり取ってしまったというオチ。"
+        },
+        {
+          q: "開封したホログラムシール缶に、SDガンダムと共に収録されていたロボットアニメは？",
+          choices: ["勇者王ガオガイガー", "新世紀エヴァンゲリオン", "機動武闘伝Gガンダム", "太陽の牙ダグラム"],
+          correct: 0,
+          explain: "正解は勇者王ガオガイガー。エルガイムやダンバインなどサンライズ作品混合のホログラムシールだった。"
+        },
+        {
+          q: "シルバーとゴールドのキラシール、梶田が「好き」と答えたのはどちらだった？",
+          choices: ["シルバー", "ゴールド", "どちらも好きではない", "色は気にしない"],
+          correct: 0,
+          explain: "正解はシルバー。「当時からシルバーが人気だった」「ゴールドはパチ物っぽい」と意気投合していた。"
+        },
+        {
+          q: "このロケは、どのイベントの後の戦利品を紹介する内容だったか？",
+          choices: ["バンダイナムコ Cross Store東京", "コミックマーケット", "AnimeJapan", "東京ゲームショウ"],
+          correct: 0,
+          explain: "正解はバンダイナムコ Cross Store東京。池袋ロケの戦利品を改めて紹介する回だった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "プロクレーンゲーマー", line: "狙った景品を確実に仕留める達人。" },
+        { min: 4, badge: "上級者", line: "コツを掴んでいる腕前。" },
+        { min: 3, badge: "中級者", line: "そこそこ景品を持ち帰れるレベル。" },
+        { min: 1, badge: "初心者", line: "まだまだ練習が必要。" },
+        { min: 0, badge: "財布が空", line: "店員さんを呼びに行くレベル。" }
+      ]
+    },
+    {
+      id: "ikebukuro-kuji-2",
+      number: 16,
+      videoTitle: "【わしら、池袋で遊ぶ②】わしらの気になる「一番くじ」、引きまくってみた【お買い物&一番くじ編】",
+      videoUrl: "https://www.youtube.com/watch?v=bhCkMT9NzGQ",
+      blurb: "一番くじエリアで気になるくじを引きまくる、池袋ロケ第2弾。",
+      locked: false,
+      questions: [
+        {
+          q: "一番くじコーナーで、選べるくじの種類数とその上限本数のルールは？",
+          choices: ["1種類のみ、5本まで", "3種類まで、それぞれ最大10本まで", "好きなだけ無制限", "2種類まで、それぞれ3本まで"],
+          correct: 1,
+          explain: "正解は3種類まで、それぞれ最大10本まで。かなり自由に選べるルールだった。"
+        },
+        {
+          q: "この動画内で話題になった、49年続いた連載が終了するという実際のニュースは？",
+          choices: ["『ドラえもん』のコロコロコミックでの掲載終了", "『クレヨンしんちゃん』の連載終了", "『名探偵コナン』の連載終了", "『ドラゴンボール』の連載終了"],
+          correct: 0,
+          explain: "正解は『ドラえもん』のコロコロコミックでの掲載終了。1977年の創刊号から続いた連載が2026年5月号で幕を閉じた。"
+        },
+        {
+          q: "動画内で「15年ぶり」だと話していたのは？",
+          choices: ["クレーンゲームをプレイすること", "池袋に来ること", "中村と梶田が一緒に買い物すること", "ぬいぐるみを集めること"],
+          correct: 0,
+          explain: "正解はクレーンゲームをプレイすること。「もう15年ぐらい前」と懐かしんでいた。"
+        },
+        {
+          q: "トムとジェリーの一番くじで欲しがっていた、光る演出のある景品は？",
+          choices: ["ジェリー ハートビートライト", "トム 目覚まし時計", "チーズ型クッション", "ジェリーの家型BOX"],
+          correct: 0,
+          explain: "正解はジェリー ハートビートライト。明かりがつく仕様が魅力的だと話していた。"
+        },
+        {
+          q: "クレーンゲームで景品が取れなかったら、冗談で「クビになる」と言われていたのは誰？",
+          choices: ["マネージャー", "中村悠一", "マフィア梶田", "カメラマン"],
+          correct: 0,
+          explain: "正解はマネージャー。「取れなかったらうちのマネージャーがクビにされる」というお決まりのジョークだった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "大当たりコレクター", line: "欲しいものを次々引き当てる強運の持ち主。" },
+        { min: 4, badge: "コレクター", line: "満足のいく戦利品を確保。" },
+        { min: 3, badge: "一般客", line: "そこそこ楽しめた買い物。" },
+        { min: 1, badge: "冷やかし", line: "見て回っただけで終わったかも。" },
+        { min: 0, badge: "素通り", line: "くじ運に見放されている。" }
+      ]
+    },
+    {
+      id: "ikebukuro-crossstore-1",
+      number: 17,
+      videoTitle: "【わしら、池袋で遊ぶ①】スタジオを飛び出して「バンダイナムコ Cross Store 東京」に遊びに来ました【クレーンゲーム】",
+      videoUrl: "https://www.youtube.com/watch?v=rlKscfy_IlI",
+      blurb: "バンダイナムコ Cross Store東京で、2万円のお小遣いを手にクレーンゲームに挑む池袋ロケ第1弾。",
+      locked: false,
+      questions: [
+        {
+          q: "今回訪れた「バンダイナムコ Cross Store 東京」で、2人に番組から用意されたお小遣いの金額は？",
+          choices: ["5,000円", "1万円", "2万円", "5万円"],
+          correct: 2,
+          explain: "正解は2万円。それぞれに現金入りの封筒が用意されていた。"
+        },
+        {
+          q: "バンダイナムコ Cross Store東京の特徴として紹介されていたのは？",
+          choices: ["一番くじ・クレーンゲーム・ガチャポンが1ヶ所に揃っている", "中古ゲームの買取専門店", "VR体験専用の施設", "声優のグッズのみを扱う店舗"],
+          correct: 0,
+          explain: "正解は一番くじ・クレーンゲーム・ガチャポンが1ヶ所に揃っていること。「1日楽しめる」と紹介されていた。"
+        },
+        {
+          q: "クレーンゲームに苦戦した際、二人が呼んで取り方のコツを聞いたのは？",
+          choices: ["店員さん", "他のお客さん", "カメラマン", "マネージャー"],
+          correct: 0,
+          explain: "正解は店員さん。ボタンの押し方など具体的なコツを教えてもらっていた。"
+        },
+        {
+          q: "用意された2万円を使い切ってしまった場合、冗談交じりにどうすると言っていた？",
+          choices: ["土下座して収録用の資金をおかわりする", "自腹で補填する", "今日は終了して帰宅する", "パチンコで増やしてから戻ってくる"],
+          correct: 0,
+          explain: "正解は土下座して収録用の資金をおかわりする。「全部使ったら土下座するから」と冗談を言っていた。"
+        },
+        {
+          q: "クレーンゲームの操作について教わったコツとして紹介されていたのは？",
+          choices: ["ボタンを2回押すとアームが好きな位置で止まる", "台を揺らすと景品が落ちやすい", "必ず正面から狙う", "最初の1回で必ず取れる裏技がある"],
+          correct: 0,
+          explain: "正解はボタンを2回押すとアームが好きな位置で止まる。店員さんに実際に教えてもらっていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "2万円を使い切る達人", line: "お小遣いを完璧に使い切り、戦利品も満足の結果。" },
+        { min: 4, badge: "上手に使い切った", line: "満足のいく買い物ができた。" },
+        { min: 3, badge: "半分残した", line: "そこそこ楽しんだが余裕あり。" },
+        { min: 1, badge: "ほぼ使わず", line: "もう少し楽しんでも良かったかも。" },
+        { min: 0, badge: "財布のヒモが硬い", line: "次はもっと楽しもう。" }
+      ]
+    },
+    {
+      id: "mtg-marvel-pr",
+      number: 18,
+      videoTitle: "【マジック：ザ・ギャザリング】Wでブースター開封！マーベル スーパー・ヒーローズ、アッセンブル！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=61iJm5Oy0rQ",
+      blurb: "マジック：ザ・ギャザリングとマーベルのコラボ新製品を紹介するPR回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回PRされたカードゲーム「マジック：ザ・ギャザリング」の発売元は？",
+          choices: ["ウィザーズ・オブ・ザ・コースト", "ブシロード", "コナミ", "スクウェア・エニックス"],
+          correct: 0,
+          explain: "正解はウィザーズ・オブ・ザ・コースト。世界最初のトレーディングカードゲームを手掛ける。"
+        },
+        {
+          q: "マジック：ザ・ギャザリングは何年にアメリカで誕生した、世界最初のトレーディングカードゲームか？",
+          choices: ["1983年", "1993年", "2003年", "2013年"],
+          correct: 1,
+          explain: "正解は1993年。現在では3万2000種類を超えるカードが作られ、全世界に約5000万人のファンがいると紹介されていた。"
+        },
+        {
+          q: "今回のマーベルコラボセットで、前作スパイダーマン編に続いて収録される「インフィニティ・ストーン」の一つは？",
+          choices: ["マインド・ストーン", "タイム・ストーン", "パワー・ストーン", "リアリティ・ストーン"],
+          correct: 0,
+          explain: "正解はマインド・ストーン。前年のスパイダーマン編に続く収録として紹介されていた。"
+        },
+        {
+          q: "このマーベルコラボ商品の発売日は？",
+          choices: ["6月26日", "7月1日", "8月20日", "12月25日"],
+          correct: 0,
+          explain: "正解は6月26日。全国のマジック公認店舗などで発売されると紹介されていた。"
+        },
+        {
+          q: "今回の「ビギナーボックス」に含まれていないものは？",
+          choices: ["すぐに遊べるデッキ2つ", "プレイマット2枚", "収録カード全種のバインダー", "スピンダウンライフカウンター2個"],
+          correct: 2,
+          explain: "正解は収録カード全種のバインダー。紹介された内容にバインダーは含まれていなかった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "アベンジャーズ級", line: "ヒーローもビランも完全に理解した実力者。" },
+        { min: 4, badge: "ヒーロー級", line: "頼れる知識の持ち主。" },
+        { min: 3, badge: "サイドキック級", line: "基本はしっかり押さえている。" },
+        { min: 1, badge: "一般市民", line: "もう少しカードの世界に詳しくなろう。" },
+        { min: 0, badge: "ヴィラン化", line: "サノスにやられたレベル。" }
+      ]
+    },
+    {
+      id: "blind-doll-box",
+      number: 19,
+      videoTitle: "【ブラインドドール】何が出るかはお楽しみ！カワイイドールBOX開ける！【光闇双生】",
+      videoUrl: "https://www.youtube.com/watch?v=nhz5DhGsOLc",
+      blurb: "今流行中のドールブラインドボックスを2箱開封する回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回紹介された「ドールのブラインドボックス」、1箱の価格帯は？",
+          choices: ["500円〜1000円", "3000円〜5000円", "8000円〜1万円", "2万円以上"],
+          correct: 1,
+          explain: "正解は3000円〜5000円。このクオリティのドールがこの価格というのが話題になっていた。"
+        },
+        {
+          q: "このブラインドボックスドールの特徴として紹介されていたのは？",
+          choices: ["プラスチック製の一体成型フィギュア", "ゴム製の球体関節を持つ小さな球体関節人形", "木彫りの人形", "缶バッジとのセット販売のみ"],
+          correct: 1,
+          explain: "正解はゴム製の球体関節を持つ小さな球体関節人形。服も布製で顔のプリントも精巧だと紹介されていた。"
+        },
+        {
+          q: "今回のラインナップで「レアモデル」として紹介されていた2体は？",
+          choices: ["グローとナイトメア", "スターライトとヒーラー", "エナジーとエモーション", "ファントムとプレイヤー"],
+          correct: 0,
+          explain: "正解はグローとナイトメア。「その1体で何箱分の価値がある」と話していた。"
+        },
+        {
+          q: "2箱を開封した結果、どんなハプニングが起きた？",
+          choices: ["2人とも同じキャラがダブった", "レアモデルが1発で当たった", "箱の中身が空だった", "説明書が入っていなかった"],
+          correct: 0,
+          explain: "正解は2人とも同じキャラがダブった。「かぶってるかも」「本当に被ってる」と盛り上がっていた。"
+        },
+        {
+          q: "今、にわかに流行っているジャンルとして紹介されていたのは？",
+          choices: ["ドールのブラインドボックス", "食玩のガチャガチャ", "トレーディングカード", "ぬいぐるみキーホルダー"],
+          correct: 0,
+          explain: "正解はドールのブラインドボックス。選んで買うのではなく、何が入っているか分からないのが特徴と紹介されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "レアモデル「ナイトメア」級", line: "何箱分もの価値がある大当たりを引き当てた。" },
+        { min: 4, badge: "レアモデル「グロー」級", line: "十分にレアな結果。" },
+        { min: 3, badge: "ノーマルモデル", line: "手堅く満足のいく結果。" },
+        { min: 1, badge: "ダブり運", line: "同じモデルを引いてしまったかも。" },
+        { min: 0, badge: "ハズレ", line: "また挑戦してみよう。" }
+      ]
+    },
+    {
+      id: "ganbare-goemon-pr",
+      number: 20,
+      videoTitle: "【がんばれゴエモン大集合！】40周年の超ボリューム！わしらがきらきら道中プレイしてみた【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=D5qAKbYAktk",
+      blurb: "コナミの40周年記念タイトル『がんばれゴエモン大集合』を紹介するPR回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回PRされたコナミの新作『がんばれゴエモン大集合』は、シリーズ何周年を記念したタイトルか？",
+          choices: ["30周年", "35周年", "40周年", "45周年"],
+          correct: 2,
+          explain: "正解は40周年。ゴエモン初のコレクションタイトルとして紹介されていた。"
+        },
+        {
+          q: "『がんばれゴエモン大集合』の発売日は？",
+          choices: ["4月2日", "7月7日", "8月20日", "12月1日"],
+          correct: 0,
+          explain: "正解は4月2日。40周年を記念した発売日だった。"
+        },
+        {
+          q: "『がんばれゴエモン大集合』に収録されているタイトル数は？",
+          choices: ["5タイトル", "8タイトル", "13タイトル", "20タイトル"],
+          correct: 2,
+          explain: "正解は13タイトル。ファミコン・スーパーファミコン・ゲームボーイの作品がまとめて収録されている。"
+        },
+        {
+          q: "収録タイトルの中に、中村悠一が「個人的に1番好き」と話していた作品が含まれていた。そのジャンルは？",
+          choices: ["RPG（外伝作品）", "対戦格闘ゲーム", "パズルゲーム", "レースゲーム"],
+          correct: 0,
+          explain: "正解はRPG（外伝作品）。ゴエモンの世界観とRPGの相性の良さが個人的に好きだと話していた。"
+        },
+        {
+          q: "現代的な利便機能として搭載されていると紹介されたのは？",
+          choices: ["巻き戻しやクイックセーブ・ロード", "オンライン対戦", "ボイスチャット機能", "フォトモード"],
+          correct: 0,
+          explain: "正解は巻き戻しやクイックセーブ・ロード。快適に懐かしのゴエモンワールドを楽しめると紹介されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "五右衛門級の忍術使い", line: "からくり屋敷も余裕でクリアする達人。" },
+        { min: 4, badge: "一人前の忍者", line: "十分な実力を持つ頼れる存在。" },
+        { min: 3, badge: "見習い忍者", line: "基本の動きは押さえている。" },
+        { min: 1, badge: "からくりに引っかかる", line: "もう少し修行が必要。" },
+        { min: 0, badge: "お尋ね者", line: "まずは基本から出直そう。" }
+      ]
+    },
+    {
+      id: "eva-30th-anniversary",
+      number: 21,
+      videoTitle: "【エヴァンゲリオン】海外限定の巨大ヘッド!? ヨコオさんの新作エヴァが楽しみなわしら【30周年】",
+      videoUrl: "https://www.youtube.com/watch?v=HWeNwVEHCc8",
+      blurb: "『エヴァンゲリオン』30周年を振り返りつつ、超巨大な初号機ヘッドフィギュアや『ANIMA』グッズを開封し、発表されたばかりの完全新作シリーズについても語る回。",
+      locked: false,
+      questions: [
+        {
+          q: "スタジオに登場した超巨大な「BNヘッドコレクション」エヴァンゲリオン初号機は、どこの国限定の公式商品として紹介された？",
+          choices: ["日本限定", "中国限定", "アメリカ限定", "韓国限定"],
+          correct: 1,
+          explain: "正解は中国限定。「中国限定の公式商品」と紹介され、その大きさに二人とも驚いていた。"
+        },
+        {
+          q: "この巨大ヘッドフィギュアに「搭載されなかった」機能とその理由として話されていたのは？",
+          choices: ["著作権処理が煩雑だから声は非搭載", "スピーカーが内蔵できず声は非搭載", "林原めぐみへの声の使用料がかかるため声は非搭載", "メーカーが声優の許可を取れず声は非搭載"],
+          correct: 2,
+          explain: "正解は林原めぐみへの声の使用料がかかるため声は非搭載。目は光るギミックがある一方、「声とか出したりはしないと。林原さんにお金払らなきゃいけないから」と話されていた。"
+        },
+        {
+          q: "劇中に登場する初号機の進化系「スーパーエヴァンゲリオン」が展開する漫画『エヴァンゲリオンANIMA』を手掛けている作家は？",
+          choices: ["貞本義行", "摩砂雪", "庵野秀明", "山下いくと"],
+          correct: 3,
+          explain: "正解は山下いくと。エヴァの設定・メカニックデザインでも知られる山下いくと氏による、人類補完計画が発動しなかった世界を描くIFストーリーの外伝作品。"
+        },
+        {
+          q: "エヴァ30周年イベントの最終日に発表された「完全新作エヴァンゲリオンシリーズ」で、シリーズ構成・脚本を担当するのは？",
+          choices: ["ヨコオタロウ", "庵野秀明", "虚淵玄", "奈須きのこ"],
+          correct: 0,
+          explain: "正解はヨコオタロウ。『ドラッグオンドラグーン』『ニーア』シリーズで知られる同氏の起用に、二人も「そう来たかと」と驚いていた。"
+        },
+        {
+          q: "「スーパーエヴァンゲリオン」のグッズシリーズについて、初号機バージョンに続いて展開されると話されていたのは？",
+          choices: ["3号機バージョン", "8号機バージョン", "2号機バージョン", "13号機バージョン"],
+          correct: 2,
+          explain: "正解は2号機バージョン。「それのシリーズで2号機もらしい」と、初号機に続くラインナップ展開が話題に上がっていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "シンクロ率200%「覚醒」", line: "暴走レベルの完璧な同調率。もはやパイロットの域を超えている。" },
+        { min: 4, badge: "シンクロ率80%「適格者」", line: "十分に高いシンクロ率。エースパイロット候補と言える結果。" },
+        { min: 3, badge: "シンクロ率50%「量産機コース」", line: "標準的な結果。もう一段階の覚醒が必要かもしれない。" },
+        { min: 1, badge: "シンクロ率10%「エントリープラグ内」", line: "起動はしたものの、本格稼働にはまだ遠い。" },
+        { min: 0, badge: "シンクロ率0%「暴走」", line: "同調できず。設定資料を読み直してから再挑戦しよう。" }
+      ]
+    },
+    {
+      id: "browndust2-3rd-anniversary",
+      number: 22,
+      videoTitle: "【ブラウンダスト2】※今回の動画は必ず一人の時に視聴してください。【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=q2sgG9LV-po",
+      blurb: "NEOWIZ提供のスマホゲーム『ブラウンダスト2』を3回目の配信でプレイ、過激なガチャ演出と新機能「シークレットイベント」にモザイクギリギリで振り回される回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回紹介された「ブラウンダスト2」の提供会社は？",
+          choices: ["Netmarble", "Cygames", "NEOWIZ", "Nexon"],
+          correct: 2,
+          explain: "正解はNEOWIZ。字幕では「ネオウズさん」と聞こえるが、実際の発売・運営元は韓国のゲーム会社NEOWIZ。"
+        },
+        {
+          q: "動画冒頭でマフィア梶田が明かした、わしゃがなTVチャンネルの現状は？",
+          choices: ["ワンアウト中で反省期間中", "特に問題なし", "収益化が停止中", "すでにBANされている"],
+          correct: 0,
+          explain: "正解は「ワンアウト中で反省期間中」。配信を始めるたびに警告画面が表示されるらしく、二人とも今日は慎重にいくと話していた。"
+        },
+        {
+          q: "ブラウンダスト2の3周年記念イベント期間中、引けるガチャの回数は最大何回以上とされている？",
+          choices: ["300回", "700回", "1000回", "1300回"],
+          correct: 3,
+          explain: "正解は1,300回以上。6月4日開始の3周年イベントで、約3ヶ月間にわたり大量のガチャチャンスが用意されている。"
+        },
+        {
+          q: "動画で紹介された新機能「シークレットイベント」は、前回の配信時には何と呼ばれていた機能か？",
+          choices: ["スペシャルミッション", "インタラクション", "デイリーボーナス", "おまけステージ"],
+          correct: 1,
+          explain: "正解は「インタラクション」。以前は「インタラクション」と呼んでいた機能が「シークレットイベント」に名称変更され、パワーアップしたと紹介された。"
+        },
+        {
+          q: "シークレットイベントの録画機能について、動画中で言及された最大録画時間は？",
+          choices: ["3分", "5分", "10分", "30分"],
+          correct: 2,
+          explain: "正解は10分。画面左上の表示を見て「10分まで回せるんだ、これ」と2人が驚いていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "言葉は不要のマスターピース級", line: "全問正解、まさに“言葉は不要”の完璧な結果。" },
+        { min: 4, badge: "水抜け確定枠", line: "かなりの高確率を引き当てた実力派。あと一歩で満点だった。" },
+        { min: 3, badge: "ステップアップ確定", line: "手堅くまとまった結果。3周年イベントを満喫できるレベル。" },
+        { min: 1, badge: "ワンアウト中", line: "ギリギリの結果。番組と一緒で反省期間が必要かも。" },
+        { min: 0, badge: "画面が浮いてます", line: "残念、ほぼモザイク越しの結果に。もう一度動画を見てから再挑戦しよう。" }
+      ]
+    },
+    {
+      id: "taurus-curve-mateba-collection",
+      number: 23,
+      videoTitle: "【ガスガン】わしらはマテバが好きなの！ 世界の名銃奇銃いろいろ持ってきた【私物紹介】",
+      videoUrl: "https://www.youtube.com/watch?v=2vMX9e1MMsc",
+      blurb: "曲がった銃「タウラス カーブ」や名機関銃「MG42」、独特な機構のリボルバー「マテバ」など、私物のガスガン・モデルガンコレクションを次々に紹介する回。",
+      locked: false,
+      questions: [
+        {
+          q: "序盤に登場した、体に沿うように曲がった珍しい形状の銃「カーブ」。実際に使用する弾薬は？",
+          choices: [".380ACP", "22LR", "9mm", "5.7mm"],
+          correct: 0,
+          explain: "正解は.380ACP。「カーブ」は世界初の曲線形状ハンドガンとして作られたモデルで、レーザーサイトを内蔵しつつ.380ACP弾を使う設計になっている。"
+        },
+        {
+          q: "「カーブ」という銃を製造しているメーカーとして動画内で紹介されたのは？",
+          choices: ["ベレッタ", "タウラス", "コルト", "グロック"],
+          correct: 1,
+          explain: "正解はタウラス。ブラジルのメーカーで、フィクション作品では悪役がよく使う銃としても話題に上がっていた。"
+        },
+        {
+          q: "電動ガンのMG42を動かすために内部に入れる単三電池は何本と話していた？",
+          choices: ["2本", "8本", "4本", "6本"],
+          correct: 2,
+          explain: "正解は4本。普通の単三電池を4本入れるほか、さらにミニバッテリーやファイアトレーサー用の充電機能もあると説明していた。"
+        },
+        {
+          q: "MG42が登場する作品として動画内で話題に出たアニメ映画は？",
+          choices: ["ブラックラグーン", "攻殻機動隊", "ゴルゴ13", "人狼"],
+          correct: 3,
+          explain: "正解は人狼。押井守が関わったケルベロスシリーズの「人狼」で、特機隊（プロテクトギア）がMG42を使う描写があると紹介されていた。"
+        },
+        {
+          q: "終盤に登場した独特な機構のリボルバー「マテバ」。このリボルバーを愛用することで知られるアニメキャラクターは？",
+          choices: ["草薙素子", "バトー", "トグサ", "荒巻大輔"],
+          correct: 2,
+          explain: "正解はトグサ。マテバはシリンダー最下段の室から発射する変わった機構を持つイタリア製オートリボルバーで、『攻殻機動隊 STAND ALONE COMPLEX』でトグサが愛用する銃として知られている。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "発射速度1200発/分 MG42級", line: "伝説の重機関銃さながらの圧倒的な知識量。銃器マニアも脱帽の結果。" },
+        { min: 4, badge: "タウラス カーブ級の切れ味", line: "隠れた名銃も的確に言い当てる、なかなかの観察眼。" },
+        { min: 3, badge: "マテバ オートリボルバー級", line: "変わり種の問題でもしっかり急所を捉える堅実な結果。" },
+        { min: 1, badge: "説明書なしの謎パーツ", line: "惜しいところで正体を見極めきれなかったようだ。" },
+        { min: 0, badge: "弾切れ(ノーガス)", line: "次回に向けてもう一度装填し直そう。" }
+      ]
+    },
+    {
+      id: "rocketnow-party-delivery",
+      number: 24,
+      videoTitle: "【ロケットナウ】今夜はパーティー！おトクなグルメ、デリバリーしてもらった【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=oCuL0HmNwew",
+      blurb: "フードデリバリーアプリ「ロケットナウ」でシェイクシャックのバーガーからフグ、寿司まで大量注文し、宴会気分で楽しむ回。",
+      locked: false,
+      questions: [
+        {
+          q: "紹介されたフードデリバリーアプリ「ロケットナウ」、累計ダウンロード数は？",
+          choices: ["100万", "500万", "700万", "1000万"],
+          correct: 1,
+          explain: "正解は500万。「累計500万ダウンロードを突破」した今注目のアプリとして紹介された。"
+        },
+        {
+          q: "ロケットナウの最大の特徴として紹介されたのは？",
+          choices: ["有料会員登録なしで送料・サービス料が何度でも無料", "初回注文のみ送料が無料", "月額会員になると割引価格になる", "配達は必ず30分以内に到着する"],
+          correct: 0,
+          explain: "正解は「有料会員登録なしで送料・サービス料が何度でも無料」。サブスク登録不要な点が最大の魅力として説明された。"
+        },
+        {
+          q: "カジ田が注文したトリプルバーガー、そのお店は？",
+          choices: ["マクドナルド", "バーガーキング", "シェイクシャック", "ケンタッキー"],
+          correct: 2,
+          explain: "正解はシェイクシャック。中村が食べたことがないというので注文し、パテの香りやバンズの違いで盛り上がった。"
+        },
+        {
+          q: "スタジオで注文して驚かれた「フグ」の値段は？",
+          choices: ["135円", "800円", "1310円", "414円"],
+          correct: 3,
+          explain: "正解は414円。大幅割引で「414円のフグ」が注文できることに二人とも驚いていた。"
+        },
+        {
+          q: "実際の配達にかかった時間は約何分だった？",
+          choices: ["15分", "47分", "60分", "90分"],
+          correct: 1,
+          explain: "正解は47分。表示された到着予定時間を見て「こんな時間かかるの」と驚くシーンがあった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "満腹度MAX「フグ×バーガー同時食い」級", line: "左手にバーガー、右手にフグ。世界初レベルの豪快な組み合わせを制覇した。" },
+        { min: 4, badge: "満腹度80%「トリプルシャック完食」級", line: "ボリューム満点のメニューをしっかり味わい尽くした。" },
+        { min: 3, badge: "満腹度60%「ポン酢リセット」級", line: "味変を挟みつつ、そこそこ楽しめた結果。" },
+        { min: 1, badge: "満腹度30%「デザート後回し」級", line: "お腹いっぱいで、ホールケーキは後で食べることに。" },
+        { min: 0, badge: "満腹度0%「ルートビアで流し込み」級", line: "満足には程遠い結果。次はしっかり注文しよう。" }
+      ]
+    },
+    {
+      id: "game-package-miniature-charm",
+      number: 25,
+      videoTitle: "【プレステ】あの頃を思い出す懐かしゲームミニチャーム！【開封動画】",
+      videoUrl: "https://www.youtube.com/watch?v=1vCMscpp0tc",
+      blurb: "PS1・PS2時代のゲームパッケージミニチュアガチャと、コントローラーやメモリーカードのチャーム付きビスケットを次々開封していく回。",
+      locked: false,
+      questions: [
+        {
+          q: "「ゲームパッケージミニチュアシリーズ」第1弾がPS1・PS2のタイトルだったのに対し、第2弾で開封していたのはどのハードのタイトルだったか？",
+          choices: ["PS1とPS2", "PSPとVita", "PS3とPS4", "Nintendo Switch"],
+          correct: 2,
+          explain: "正解はPS3とPS4。アンチャーテッドやラストオブアスなど、PS3・PS4世代の人気タイトルのミニチュアが登場した。"
+        },
+        {
+          q: "サルゲッチシリーズについて、「2じゃなくて1が一番好き」と語られていたのはどのタイトルか？",
+          choices: ["サルゲッチ(初代・PS1)", "サルゲッチ2", "がんばれ森川くん2号", "I.Q. Intelligent Qube"],
+          correct: 0,
+          explain: "正解はサルゲッチ(初代・PS1版)。網で猿を捕まえる瞬間の気持ち良さや、最後にスティックで網を振り回す操作が絶賛されていた。"
+        },
+        {
+          q: "開封したPlayStation2用メモリーカードの容量は何MBだったか？",
+          choices: ["4MB", "16MB", "32MB", "8MB"],
+          correct: 3,
+          explain: "正解は8MB。実際のPS2純正メモリーカードも8MB仕様で、当時は雑誌の付録シールを貼って個性を出していたという話で盛り上がった。"
+        },
+        {
+          q: "「ミニチュアチャーム付きビスケット」は全部で何種類のラインナップだったか？",
+          choices: ["8種", "11種", "15種", "20種"],
+          correct: 1,
+          explain: "正解は11種。「何種ですか?」「11。」というやり取りがあり、1箱ではとてもコンプできない数だと話していた。"
+        },
+        {
+          q: "開封した箱の中の「アンチャーテッド」と「ラストオブアス」のミニチュアは、合計で何本分あったか？",
+          choices: ["5本", "6本", "7本", "9本"],
+          correct: 2,
+          explain: "正解は7本。アンチャーテッドシリーズ5本とラストオブアス2本という豪華なラインナップに「もうちょっとあるでしょ」と驚いていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "全種コンプ勢「伝説の懐古厨」", line: "シークレットまで残さず引き当てる、生粋のレトロゲーマー。" },
+        { min: 4, badge: "レア確定「通コンマスター」", line: "かなりの当たり運。ラインナップの大半を把握している。" },
+        { min: 3, badge: "ノーマル運「PS2世代」", line: "手堅く当てて、そこそこ満足の結果。" },
+        { min: 1, badge: "まさかのダブり「メモリーカード難民」", line: "同じコントローラーばかり引いてしまい、次の1個に賭けたくなる。" },
+        { min: 0, badge: "開かずの箱「積みゲー予備軍」", line: "また挑戦して、お目当てのシークレットを狙おう。" }
+      ]
+    },
+    {
+      id: "stellar-idol-mirishira",
+      number: 26,
+      videoTitle: "【STELLAR IDOL PROJECT】アイドル「ホ〇〇軒」プロデューサー始めました!? ステラPミリしら開催！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=J2Dj3DOEFcU",
+      blurb: "スマホゲーム『ステラアイドルプロジェクト』とのタイアップで、中村がビワマネージャーを目指してアイドルの名前とキャッチコピーを当てるミリしらクイズに挑戦する回。",
+      locked: false,
+      questions: [
+        {
+          q: "動画で紹介された『ステラアイドルプロジェクト』はどんなジャンルのスマホゲームとして紹介された？",
+          choices: ["王道の恋愛シミュレーションゲーム", "放置型のアイドル育成RPG", "対戦型リズムアクションゲーム", "推理パズルアドベンチャー"],
+          correct: 1,
+          explain: "正解は放置型のアイドル育成RPG。現代日本を舞台に、様々な仕事を通じてアイドルをプロデュースし絆を深めていく作品として紹介された。"
+        },
+        {
+          q: "この動画内で語られた『ステラアイドルプロジェクト』が1周年を迎える日付は？",
+          choices: ["4月1日", "5月30日", "6月8日", "6月17日"],
+          correct: 3,
+          explain: "正解は6月17日。梶田が『6月17日に1周年を迎えるタイトル』と紹介していた。"
+        },
+        {
+          q: "3人組レーベル『ミライリンク』のメンバーとして紹介されなかったアイドルは誰？",
+          choices: ["天地ミカ", "陽葵まゆ", "小春セリーナ", "海里あずま"],
+          correct: 0,
+          explain: "正解は天地ミカ。ミライリンクは陽葵まゆ・小春セリーナ・海里あずまの3人で構成されるレーベルで、天地ミカは双子として別レーベル『エクリプスボイス』のメンバー。"
+        },
+        {
+          q: "双子のメンバーを擁する、ダークな世界観を持つレーベルの名前は？",
+          choices: ["ダークジェミニギャル", "オセロレーベル", "エクリプスボイス", "ホープ券"],
+          correct: 2,
+          explain: "正解はエクリプスボイス。中村が『ダークジェミニギャル』などと迷走した末、正解として明かされたのはエクリプスボイスだった。"
+        },
+        {
+          q: "エクリプスボイスの中心人物・あやなの身長として紹介されたのは？",
+          choices: ["143cm", "148cm", "153cm", "158cm"],
+          correct: 1,
+          explain: "正解は148cm。梶田が出したヒントの中で、体重42kgとあわせて148cmという身長が伝えられていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "伝説の全部合体プロデューサー", line: "マネージャーもタレントも兼任できる新職業を極めた貫禄。全問正解で『合体』芸に説得力が出た。" },
+        { min: 4, badge: "凄腕ビワマネージャー", line: "ほぼ完璧な戦績。あと一歩でプロデューサー権利のチケットも夢じゃない。" },
+        { min: 3, badge: "新人マネージャー見習い", line: "本編の中村さんと同じくらいの手応え。惜しい珍回答も愛嬌のうち。" },
+        { min: 1, badge: "募集されかけコース", line: "ヒントを聞いても答えがなかなか繋がらない。梶田に『合体』を提案されかねないレベル。" },
+        { min: 0, badge: "即・合体候補", line: "正解ゼロ。ホープ券もラーメン部もまとめて覚え直そう。" }
+      ]
+    },
+    {
+      id: "dreamcast-watch-leon-gasgun",
+      number: 27,
+      videoTitle: "【バイオハザード】ドリキャス腕時計にレオンガスガン！部屋の奥からレアモノ続々発掘！？ 【私物紹介】",
+      videoUrl: "https://www.youtube.com/watch?v=5AwJQYUq-8o",
+      blurb: "家の掃除中に発掘された、FFグッズやバイオハザードのガスガンなど懐かしいレアアイテムの数々を紹介する回。",
+      locked: false,
+      questions: [
+        {
+          q: "掘り出し物の一つ、FF11の「サンドリアリング」について、動画中で語られた入手条件は?",
+          choices: ["誰でも好きなタイミングでもらえる", "お金を払って購入する", "種族と最初に選ぶ国（街）が合致した場合にもらえる", "レベル99に到達するともらえる"],
+          correct: 2,
+          explain: "正解は「種族と最初に選ぶ国（街）が合致した場合にもらえる」。サンドリアで始めるとサンドリアリングがもらえるが、種族と街が合わないともらえないという話だった。"
+        },
+        {
+          q: "「ザ・バウンサー」とのコラボ腕時計について、二人の会話で出た結論は?",
+          choices: ["誰も着けていなかった、ただのコラボグッズ", "主人公キャラの形見だった", "発売日に配られたノベルティだった", "劇中のモデルガンの付属品だった"],
+          correct: 0,
+          explain: "正解は「誰も着けていなかった、ただのコラボグッズ」。「誰もつけてないんじゃない?コラボなんじゃない?」という会話の通り、キャラが着用していたモデルではなかった。"
+        },
+        {
+          q: "ドリームキャストの腕時計にまつわるエピソードとして、動画で語られた内容は?",
+          choices: ["中古ショップで偶然見つけて衝動買いした", "発売日に開店前から並んで購入した", "友人からのプレゼントだった", "ファミ通（エンターブレイン）の通販で注文し、届いたことを忘れていて問い合わせた後に届いていたと気づいた"],
+          correct: 3,
+          explain: "正解はファミ通（エンターブレイン）の通販で注文したが忘れていたエピソード。問い合わせたところ配送済みと言われ、翌日高いボックスに入って見つかったという話だった。"
+        },
+        {
+          q: "紹介された「侍エッジ」のカスタムショップは、バイオハザード2に登場する何という店の設定?",
+          choices: ["アンブレラ武器庫", "ケンドーガンショップ", "RPDアーマリー", "STARSオフィス"],
+          correct: 1,
+          explain: "正解はケンドーガンショップ。バイオハザード2に登場する銃砲店で、店主は住民に武器を配りながらゾンビに襲われ命を落としたことでも知られる。"
+        },
+        {
+          q: "動画内で紹介された『バイオハザード レクイエム』でのレオンの年齢は?",
+          choices: ["35歳", "42歳", "49歳", "55歳"],
+          correct: 2,
+          explain: "正解は49歳。バイオ2の頃は21歳だったレオンも、2026年発売の『バイオハザード レクイエム』では49歳という設定になっている。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "生存ランクSS「レジェンド生存者」", line: "感染の気配すら寄せ付けない、完全生還レベルの知識量。" },
+        { min: 4, badge: "生存ランクS「ベテランSTARS隊員」", line: "かなりの実力者。ラクーンシティも生き延びられそう。" },
+        { min: 3, badge: "生存ランクA「一般生存者」", line: "及第点の生存力。装備を整えればまだまだ戦える。" },
+        { min: 1, badge: "感染ランクB「初期症状あり」", line: "ちょっと記憶があやふや。早めの補給が必要かも。" },
+        { min: 0, badge: "感染ランクZ「ゾンビ化」", line: "一度復習してから再挑戦しよう。" }
+      ]
+    },
+    {
+      id: "dq-carddass-sd-box",
+      number: 28,
+      videoTitle: "【ドラクエ】1&2キャラが描き下ろしSD化！ DQカードダスを開ける！【開封動画】",
+      videoUrl: "https://www.youtube.com/watch?v=72PIKIuZl40",
+      blurb: "バンダイの「カードダス ドラゴンクエスト」（DQI&II、描き下ろしSDイラスト）を2箱開封し、全種コンプリートを目指す回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回開封した「カードダス ドラゴンクエスト」、カードは全部で何種類あった？",
+          choices: ["20種", "30種", "25種", "40種"],
+          correct: 1,
+          explain: "正解は30種。ノーマル15種とプリズム(キラ)15種を合わせた全30種のラインナップだった。"
+        },
+        {
+          q: "このカードダス、1パックに入っているカードは何枚？",
+          choices: ["1枚", "2枚", "3枚", "5枚"],
+          correct: 2,
+          explain: "正解は3枚。「ワンパック3枚入りです」と紹介されていた。"
+        },
+        {
+          q: "引いたカードの中で二人が「トラウマ」「うざい」と盛り上がった、4体並んで呪文を連打してくるモンスターは？",
+          choices: ["しにがみ", "キラーマシン", "ドラキー", "ブリザード"],
+          correct: 3,
+          explain: "正解はブリザード。4体のブリザードが揃って「ザラキ」を連打してくるカードで、「めっちゃうざい」と反応していた。"
+        },
+        {
+          q: "結局、二人は何箱でシリーズ全種のコンプリートを達成した？",
+          choices: ["2箱", "1箱", "3箱", "5箱"],
+          correct: 0,
+          explain: "正解は2箱。「2箱で揃いましたね」と、2箱でのコンプリートを喜んでいた。"
+        },
+        {
+          q: "コンプリートを決定づけた、最後の1枚として引き当てたカードは？",
+          choices: ["はぐれメタル", "ローラ姫", "ゴーレム", "サマルトリアの王女"],
+          correct: 2,
+          explain: "正解はゴーレム。「出た来た、ゴーレム！」の後に「コンプです」と全種制覇が確定した。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "勇者級(2箱コンプ)", line: "まるで実際にコンプリートを決めた瞬間のような会心の冒険者。" },
+        { min: 4, badge: "戦士級", line: "十分な強さ。あと一押しで完全制覇だ。" },
+        { min: 3, badge: "武闘家級", line: "手堅い戦績。次の冒険にも期待できる。" },
+        { min: 1, badge: "ホイミスライム級", line: "経験値はわずか。もう一度挑戦してレベルアップしよう。" },
+        { min: 0, badge: "しにがみ級(要再挑戦)", line: "呪文が外れ気味…もう一度カードダスに挑もう。" }
+      ]
+    },
+    {
+      id: "koukaku-exhibition-35man",
+      number: 29,
+      videoTitle: "【攻殻機動隊展】ゴーストにささやかれ35万円 大人買い！？ 攻殻展のオシャレなグッズ買ってみた【GHOST IN THE SHELL】",
+      videoUrl: "https://www.youtube.com/watch?v=IflEw9KWaY8",
+      blurb: "攻殻機動隊展で総額35万円分のグッズを大人買いし、スカジャンやレコード、缶バッジなど戦利品を次々開封していく回。",
+      locked: false,
+      questions: [
+        {
+          q: "攻殻機動隊展でグッズを大人買いした今回の総額は？",
+          choices: ["15万円", "25万円", "35万円", "55万円"],
+          correct: 2,
+          explain: "正解は35万円。動画冒頭で「そして総額35万円」とはっきり明言されている。"
+        },
+        {
+          q: "会場で購入したブラインドの缶バッジは全何種類だった？",
+          choices: ["30種", "20種", "40種", "50種"],
+          correct: 0,
+          explain: "正解は30種。缶バッジはランダム全30種類で、動画内では合計60個購入したと話している。"
+        },
+        {
+          q: "今回買ったアパレルの中で一番高額だった「スカジャン（スタジャン）」の値段は？",
+          choices: ["1万2000円", "2万800円", "2万9800円", "3万5200円"],
+          correct: 3,
+          explain: "正解は3万5200円。「これが俺のアパレの中で1番高いくらいした」大物として紹介されたスカジャンの値段として明言されている。"
+        },
+        {
+          q: "そのスカジャンを実際に着てみた結果どうなった？",
+          choices: [
+            "普段着としてよく着ることにした",
+            "サイズが合わず壁に飾ることにした",
+            "返品して返金してもらった",
+            "解体して別グッズにリメイクした"
+          ],
+          correct: 1,
+          explain: "正解は「サイズが合わず壁に飾ることにした」。XXLまでしかなく、普段3XLを着ている体格には袖が足りず、着用を断念する流れになった。"
+        },
+        {
+          q: "動画内で、新作アニメ「攻殻機動隊 THE GHOST IN THE SHELL」のロゴデザインを手がけたと紹介されたアーティストは？",
+          choices: ["空山基", "士郎正宗", "シドミード", "H.R.ギーガー"],
+          correct: 0,
+          explain: "正解は空山基。会話の中で一度「シドミード」と言い間違えた後、正しくは空山基だと訂正している。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "全身義体レベル", line: "細胞義体専用ガムも余裕で食べこなす、完全義体化した猛者の議体化率。" },
+        { min: 4, badge: "電脳化済みレベル", line: "かなり深く記憶と情報がリンクしている。攻殻沼にどっぷりな結果。" },
+        { min: 3, badge: "部分義体レベル", line: "標準的な義体化率。基本はしっかり押さえている。" },
+        { min: 1, badge: "生身のまま", line: "ゴーストむき出し。もう一度物販ブースを回ってみよう。" },
+        { min: 0, badge: "はぐれゴースト", line: "ネットに接続しきれなかったか。もう一度見返してみて。" }
+      ]
+    },
+    {
+      id: "dot-abyss-tavern-draft",
+      number: 30,
+      videoTitle: "【ドットアビス】一番オシゴトが出来そうなスタッフをスカウト！わしゃがな酒場ドラフト会議開催！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=5vcJyYUtF4g",
+      blurb: "PRタイトル『ドットアビス』の体験プレイと、酒場の最強スタッフ3人をドラフト形式で決める企画に挑んだ回。",
+      locked: false,
+      questions: [
+        {
+          q: "動画内で紹介された『ドットアビス』の世界観。3つの大国が割拠し、争いの果てに『大穴』が出現したとされる舞台の地方名は？",
+          choices: ["トレスリア地方", "エルドラーナ地方", "ミレスガルド地方", "ペルディオン地方"],
+          correct: 0,
+          explain: "正解はトレスリア地方。3つの大国が割拠していたこの地に突如争いの終焉が訪れ、大地を貫く謎の巨穴『大穴』が現れたという設定が紹介された。"
+        },
+        {
+          q: "体験プレイで挑んだボス戦。大穴から溢れ出し人類を襲うとされるこの敵は何と呼ばれる存在？",
+          choices: ["ダークロード", "怪物ウィルス", "魔王軍", "厄災"],
+          correct: 3,
+          explain: "正解は厄災。大穴から溢れ出す未知の怪物として紹介され、実際に厄災とのボス戦を体験プレイしていた。"
+        },
+        {
+          q: "体験プレイ中、戦闘がやけに速く進むことに気づいた2人。実際の戦闘速度の設定は？",
+          choices: ["デフォルト等倍・最大2倍速まで可能", "デフォルト2倍速・最大3倍速まで可能", "デフォルト3倍速・最大4倍速まで可能", "デフォルト2倍速・最大5倍速まで可能"],
+          correct: 1,
+          explain: "正解はデフォルト2倍速・最大3倍速まで可能。「早いと思ったら」とツッコミつつ確認すると、最初から2倍速設定になっており、3倍速まで上げられることが判明した。"
+        },
+        {
+          q: "「最強の酒場を経営しよう」ドラフト企画。酒場スタッフは何人編成で、うち何人が最初から固定キャラだった？",
+          choices: ["4人編成・2人固定", "8人編成・4人固定", "6人編成・3人固定", "5人編成・2人固定"],
+          correct: 2,
+          explain: "正解は6人編成・3人固定。マリナ・ベリサ・ソフィアの3人は固定で、残り3枠を2人でドラフト形式で選ぶ企画だった。"
+        },
+        {
+          q: "第3希望でお互い『ジェンマ』を指名して被ってしまい、くじ引き対決に。負けた中村さんが代わりに獲得したキャラは？",
+          choices: ["ソフィア", "フレデリカ", "エレクトラ", "ひまり"],
+          correct: 3,
+          explain: "正解はひまり。くじ引きでわしゃがな氏がジェンマを獲得し、負けた中村さんはルクスノー所属のSRキャラ・ひまりを代わりに獲得した。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "ドラフト1位指名「伝説の看板スタッフ」", line: "全問正解、即戦力オーナーの貫禄。数字もキャラも逃さずスカウトできた大当たり編成。" },
+        { min: 4, badge: "即戦力ルーキー", line: "十分に狙い通りのドラフト。エース級の活躍が期待できる。" },
+        { min: 3, badge: "育成枠スタッフ", line: "基礎は押さえているが、まだ伸びしろあり。もう一度動画を見返すとコンボが揃うかも。" },
+        { min: 1, badge: "外れ1位", line: "くじ運に泣かされた様子。次の第2希望に賭けよう。" },
+        { min: 0, badge: "戦力外通告", line: "残念、スカウト網には引っかからず。動画を見返してリベンジ確定。" }
+      ]
+    },
+    {
+      id: "sd-gundam-snack2-60fukuro",
+      number: 31,
+      videoTitle: "【元祖SDガンダムスナックII】バンダイでガンダムスナック開封！？60袋で目指せコンプ！【開封動画】",
+      videoUrl: "https://www.youtube.com/watch?v=IFga28iMK2I",
+      blurb: "「元祖SDガンダムスナックII」を60袋用意してコンプを目指す開封回。最後の1袋でまさかのコンプ達成に至る。",
+      locked: false,
+      questions: [
+        {
+          q: "今回のコンプ挑戦のために用意した袋の数は？",
+          choices: ["40袋", "50袋", "60袋", "80袋"],
+          correct: 2,
+          explain: "正解は60袋。「ちなみに用意してた数は60袋です」とほぼ倍量を用意して挑んでいた。"
+        },
+        {
+          q: "シールは全何種類のラインナップだと話していたか？",
+          choices: ["25種", "30種", "33種", "40種"],
+          correct: 2,
+          explain: "正解は33種。「全33だったと思う」と話し、「さすがにこんだけありゃ揃うでしょ」と期待していた。"
+        },
+        {
+          q: "コンプリートを達成したのは何袋目だったか？",
+          choices: ["30袋目", "50袋目", "55袋目", "最後の60袋目"],
+          correct: 3,
+          explain: "正解は最後の60袋目。「最後の袋から出るのはすごい」「ようやくわしゃの完全勝利」と、まさにラスト1袋での達成だった。"
+        },
+        {
+          q: "お菓子の味を例えるのに登場した組み合わせは？",
+          choices: ["ポテトチップスとえびせん", "カールとポテコの合体", "じゃがりことカール", "ポテロングとハッピーターン"],
+          correct: 1,
+          explain: "正解はカールとポテコの合体。「薄いカールの香りがする」「カールとポテロングの合体したみたいな」と表現していた。"
+        },
+        {
+          q: "シールの改善点として挙げていた要望は「味の改善」と、あともう一つは？",
+          choices: ["箱を大きくしてほしい", "シールを剥がしやすくしてほしい", "値段を下げてほしい", "種類を減らしてほしい"],
+          correct: 1,
+          explain: "正解はシールを剥がしやすくしてほしい。「万引帽子は分かるけど、まずきやすくすることと」と、盗難防止の粘着が強すぎる点を指摘していた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "大将軍級(60袋完全制覇)", line: "最後の1袋でコンプを決める、まさに奇跡の運を持つ大将軍。" },
+        { min: 4, badge: "エースパイロット級", line: "十分な戦果。あと一押しでコンプ制覇だ。" },
+        { min: 3, badge: "量産機パイロット級", line: "手堅い戦績。基本はしっかり押さえている。" },
+        { min: 1, badge: "新兵級", line: "開封の記憶がまだ薄いようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "シークレット逃し級", line: "当たりを引き逃した様子。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "gaime-guncon-timecrisis",
+      number: 32,
+      videoTitle: "【ジーエイム】力の限り撃ちまくれ！懐かしゲーセンシューティングをガンコンで遊ぶ【GAIME】",
+      videoUrl: "https://www.youtube.com/watch?v=dXe_i6ykBLo",
+      blurb: "テレビをカメラで認識する新方式のガンコン「GAIME」で、タイムクライシスやスティールガンナーを撃ちまくる回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回のガンコンが採用していた、旧来のブラウン管方式とは違う新しい読み取り方式は？",
+          choices: ["赤外線センサー方式", "カメラで画面を読み取る方式", "Bluetooth連動方式", "タッチパネル方式"],
+          correct: 1,
+          explain: "正解はカメラで画面を読み取る方式。「カメラで読み込む」「映ってる情報を読み取ってそれを処理する」仕組みだと説明されていた。"
+        },
+        {
+          q: "一緒に遊んだ「スティールガンナー」というゲームについて、二人はどんな状態だったか？",
+          choices: ["二人とも大好きでやり込んでいた", "二人ともプレイ経験がなかった", "梶田さんだけプレイ経験があった", "中村さんだけプレイ経験があった"],
+          correct: 1,
+          explain: "正解は二人ともプレイ経験がなかった。「最初いきなりやったことないゲームからな」「2人とも知らないゲームからこれ」と話していた。"
+        },
+        {
+          q: "ゲーム中、ボム（大技）を発動するボタンはどちら？",
+          choices: ["Aボタン", "Bボタン", "Xボタン", "Yボタン"],
+          correct: 1,
+          explain: "正解はBボタン。「こっちのBボタンだ」「Bボタンボムか」というやり取りでボムの操作方法が判明していた。"
+        },
+        {
+          q: "プレイ中、二人が何度も誤って撃ってしまっていたのは何だったか？",
+          choices: ["味方キャラ", "一般人（市民）", "背景の建物", "自分の足元"],
+          correct: 1,
+          explain: "正解は一般人（市民）。「また一般人打っちまった」「一般市民打ってたよ」と、誤射を繰り返しては苦情を受けていた。"
+        },
+        {
+          q: "プレイ後、二人が揃って痛がっていた体の部位は？",
+          choices: ["手首", "人差し指", "肩", "目"],
+          correct: 1,
+          explain: "正解は人差し指。「人差し指がもう限界」「押しっぱなしでカチャカチャやってないのにもう痛い」と繰り返し話していた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "伝説のガンスリンガー級", line: "一般人ゼロ、テロリストだけを的確に仕留める伝説の腕前。" },
+        { min: 4, badge: "凄腕スイーパー級", line: "かなりの命中精度。もう少しでノーミスクリアだ。" },
+        { min: 3, badge: "新米捜査官級", line: "基本はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "誤射多発の新人級", line: "記憶がまだ曖昧なようだ。もう一度動画を見返してみよう。" },
+        { min: 0, badge: "一般人ばかり撃つ問題児級", line: "照準がだいぶブレている様子。リトライ推奨。" }
+      ]
+    },
+    {
+      id: "acid-rain-ninja-red-crew",
+      number: 33,
+      videoTitle: "【アシッドレイン】世紀末ニンジャ参上！荒廃世界の新勢力フィギュアを開封！【ACID RAIN】",
+      videoUrl: "https://www.youtube.com/watch?v=XNpnrJ4CjlQ",
+      blurb: "前回に続き「ACID RAIN WORLD」のフィギュアを追加購入。今回はアジア系コンセプトの新勢力を中心に開封していく。",
+      locked: false,
+      questions: [
+        {
+          q: "今回集めたフィギュアは、どんなコンセプトのものを中心に揃えたと話していたか？",
+          choices: ["アジア系コンセプト", "北欧系コンセプト", "南米系コンセプト", "中東系コンセプト"],
+          correct: 0,
+          explain: "正解はアジア系コンセプト。「前回あんまりなかったどっちかというとアジア系コンセプト見受けられるものを揃えてみた」と話していた。"
+        },
+        {
+          q: "「ハズマット」という言葉の意味として紹介されたのは？",
+          choices: ["特殊部隊の階級名", "危険な環境に送り込まれる兵士", "勢力のリーダーの称号", "武器の種類"],
+          correct: 1,
+          explain: "正解は危険な環境に送り込まれる兵士。ハズマットは危険物質を指す言葉で、そこから「危険な環境に送り込まれる兵士ってこと」だと解説されていた。"
+        },
+        {
+          q: "「火脅し」という名前の兵士のマスクのモチーフになっている動物は？",
+          choices: ["トラ", "イノシシ", "オオカミ", "クマ"],
+          correct: 1,
+          explain: "正解はイノシシ。「あ、イノシシだな。これ顔のモチーフ」と、牙のようなデザインからイノシシがモチーフだと気づいていた。"
+        },
+        {
+          q: "中村さんが集めている「バックスチーム」のモチーフとなっている動物は？",
+          choices: ["ウマ", "シカ", "ウシ", "ヤギ"],
+          correct: 1,
+          explain: "正解はシカ。「これバックスチームっていう、鹿をモチーフにしてるからアメリカかな」と紹介されていた。"
+        },
+        {
+          q: "フィギュア1体あたりの値段として話していた金額は？",
+          choices: ["3000～4000円", "5000～6000円", "8000～9000円", "1万2000円以上"],
+          correct: 2,
+          explain: "正解は8000～9000円。「この1体でね8000か9000円するんだよ」と、平行輸入ゆえの高さを嘆いていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "隠密部隊隊長級", line: "共通パーツの少ない世界観をしっかり読み解いた、勢力分析のスペシャリスト。" },
+        { min: 4, badge: "特殊部隊員級", line: "十分な理解度。あと一押しで隊長に昇格だ。" },
+        { min: 3, badge: "一般兵級", line: "基本装備はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "新兵級", line: "記憶がまだ曖昧なようだ。もう一度動画を見返してみよう。" },
+        { min: 0, badge: "勢力不明の民間人級", line: "世界観の把握はこれから。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "magical-princess-suzushiro",
+      number: 34,
+      videoTitle: "【ゲスト：鈴代紗弓】わしらの「まじかる☆プリンセス」はどんな子に育つ？【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=BuItZlkTY_U",
+      blurb: "声優・鈴代紗弓さんをゲストに迎え、娘育成シミュレーション「まじかる☆プリンセス」のいい子ルートと悪い子ルートを実際にプレイする回。",
+      locked: false,
+      questions: [
+        {
+          q: "ゲストの鈴代紗弓さんが担当した、ゲーム内の娘のキャラクター名は？",
+          choices: ["アリス", "エマ", "ロール", "ショコラ"],
+          correct: 0,
+          explain: "正解はアリス。「アリスって名乗らせてもらってる」「デフォネームがアリスちゃん」と紹介されていた。"
+        },
+        {
+          q: "このゲームの元になったと紹介されたボードゲームシリーズは？",
+          choices: ["マジカルシリーズ", "プリンセスシリーズ", "ファンタジーシリーズ", "ドリームシリーズ"],
+          correct: 0,
+          explain: "正解はマジカルシリーズ。「ボードゲームで人気を博したマジカルシリーズっていうのがございまして」とその世界観を元に作られたと説明されていた。"
+        },
+        {
+          q: "エンディングは何パターン以上あると紹介されていたか？",
+          choices: ["10種類以上", "30種類以上", "50種類以上", "100種類以上"],
+          correct: 2,
+          explain: "正解は50種類以上。「50種類以上のエンディングへ分岐していく」と紹介されていた。"
+        },
+        {
+          q: "このゲームの音声について紹介されていた特徴は？",
+          choices: ["主人公のみボイス付き", "前編フルボイス", "一部無音声", "選択制ボイス"],
+          correct: 1,
+          explain: "正解は前編フルボイス。「ゲームが前編フルボイスとなっておりまして」と紹介され、「珍しいんじゃないか」と話していた。"
+        },
+        {
+          q: "このゲームのSteamでの発売価格は？",
+          choices: ["980円", "1980円", "2980円", "3980円"],
+          correct: 1,
+          explain: "正解は1980円。「Steamにて通常価格1980円にて発売中です」と紹介されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "良いお父さん級(全善ゲージMAX)", line: "娘との会話も家族旅行も完璧。まさに理想のパパそのもの。" },
+        { min: 4, badge: "優しいお父さん級", line: "十分に良い選択ができている。あと一押しで満点パパだ。" },
+        { min: 3, badge: "普通のお父さん級", line: "基本はしっかり押さえている手堅い育成。" },
+        { min: 1, badge: "心配なお父さん級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "闇カジノ出禁お父さん級", line: "育成方針、要見直し。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "bigzam-fukudada",
+      number: 35,
+      videoTitle: "【ゲスト：フクダーダ】値段もサイズも超ビッグ！先生に超でかいビグ・ザム持ってきてもらった【ガンダム】",
+      videoUrl: "https://www.youtube.com/watch?v=d3pxeW-kVPc",
+      blurb: "漫画家フクダーダ先生が持ち込んだ超大型のビッグザムを、プロジェクターギミックまでたっぷり検証する回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回フクダーダ先生が持ち込んだ「ビッグザム」が使用する電池は？",
+          choices: ["単1電池2本", "単2電池2本", "単3電池3本", "単4電池4本"],
+          correct: 2,
+          explain: "正解は単3電池3本。「単3を3つ」「これ3つも電池使う」と紹介され、電池ボックスの蓋をマイナスドライバーで開けていた。"
+        },
+        {
+          q: "ビッグザムの目についていた特殊なギミックは？",
+          choices: ["LEDが光るだけの単純な発光", "ドズルの搭乗シーンを投影するプロジェクター機能", "目の色が変わるセンサー", "声が流れるスピーカー機能"],
+          correct: 1,
+          explain: "正解はプロジェクター機能。「後ろから照射する」仕組みで、劇場版・テレビ版それぞれのドズル搭乗シーンを投影できるギミックが搭載されていた。"
+        },
+        {
+          q: "このビッグザムはどのフィギュアブランドから発売されているか？",
+          choices: ["ROBOT魂", "メタルビルド", "HGUC", "フィギュアライズ"],
+          correct: 0,
+          explain: "正解はROBOT魂。「ROBOT魂」ブランドのアニメ再現シリーズとして紹介されていた。"
+        },
+        {
+          q: "ビッグザムの凶悪な爪から発射される対空防御用のミサイルは何発？",
+          choices: ["4発", "6発", "8発", "10発"],
+          correct: 1,
+          explain: "正解は6発。「6発ですか？」「対空防御、逆にこれしかないから」というやり取りで、爪から6連ミサイルが飛び出すギミックが確認された。"
+        },
+        {
+          q: "プロジェクターで投影されるドズルの映像は、劇場版・テレビ版のどちらだったか？",
+          choices: ["劇場版のみ", "テレビ版のみ", "両方収録されていた", "どちらでもないオリジナル映像"],
+          correct: 2,
+          explain: "正解は両方収録されていた。テレビ版の投影を見た後「劇場版も見てみますね」と切り替え、作画の違いまで見比べていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "ジオン公国准将級", line: "メガ粒子砲もプロジェクターギミックも完全掌握。もはやドズル本人の貫禄。" },
+        { min: 4, badge: "ジオン正規兵級", line: "十分な理解度。あと一押しで准将に昇格だ。" },
+        { min: 3, badge: "モビルスーツ整備兵級", line: "基本装備はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "民間人級", line: "記憶がまだ曖昧なようだ。もう一度動画を見返してみよう。" },
+        { min: 0, badge: "連邦の一般兵級", line: "ビッグザムの前ではまだまだ。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "fgo-wafers-80mai",
+      number: 36,
+      videoTitle: "【FGO】カワイイサーヴァント召喚！シールウエハース 80枚でコンプを目指す！【にふぉるめーしょん】",
+      videoUrl: "https://www.youtube.com/watch?v=69o7RlYGULk",
+      blurb: "FGOのリフォルメ絵柄ウエハースを4箱・80枚用意してコンプを目指すが、最後の1枚に泣かされる回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回用意したウエハースは何箱・何枚分だったか？",
+          choices: ["2箱・40枚", "3箱・60枚", "4箱・80枚", "5箱・100枚"],
+          correct: 2,
+          explain: "正解は4箱・80枚。「一応ね4箱用意したから」「80枚うん80枚」というやり取りで確認できる。"
+        },
+        {
+          q: "1箱目からいきなり引き当てた、URの1個下という激レアなカードのランクは？",
+          choices: ["SR", "RR", "PSR", "N"],
+          correct: 2,
+          explain: "正解はPSR。「PSRだよ」「URの1個下やね。2枚しかないっすよ」と、いきなりの当たりに驚いていた。"
+        },
+        {
+          q: "この動画で最初に引いたサーヴァントは誰だったか？",
+          choices: ["サリエリ", "オベロン", "ネロ", "ジャンヌオルタ"],
+          correct: 0,
+          explain: "正解はサリエリ。「俺はサリエリ引きました。アベンジャーアントニオサリエリでございます」と、トップバッターで登場していた。"
+        },
+        {
+          q: "最後まで引けず、コンプリートを阻んだサーヴァントは？",
+          choices: ["マシュ", "ソロモン", "キング", "マーリン"],
+          correct: 1,
+          explain: "正解はソロモン。「一部のラスボス」であるソロモンだけが最後まで出ず、「残り1枚コンプならず」となった。"
+        },
+        {
+          q: "結局、このウエハースはコンプリートできたか？",
+          choices: ["できた", "あと1枚のところでできなかった", "半分もいかなかった", "2箱で余裕でコンプできた"],
+          correct: 1,
+          explain: "正解はあと1枚のところでできなかった。ソロモンだけが出ず「残り1枚コンプならず」で悔しがっていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "ソロモン級（コンプ達成）", line: "一部のラスボスすら味方につけた、まさにグランドマスターの引き。" },
+        { min: 4, badge: "UR級", line: "十分すぎる強運。あと一押しでコンプだ。" },
+        { min: 3, badge: "レア級", line: "基本はしっかり押さえている手堅い戦績。" },
+        { min: 1, badge: "ノーマル級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "ダブり多発級", line: "引きの記憶がまだ薄い様子。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "argama-catapult-deck",
+      number: 37,
+      videoTitle: "【ガンダム】迫力のジオラマ「アーガマ」開封！ 部屋から出てきたガンダムグッズ、発艦！【私物紹介】",
+      videoUrl: "https://www.youtube.com/watch?v=WJMpY_Jg7EU",
+      blurb: "大掃除で見つかった古いガンプラやLDを紹介しつつ、本命のアーガマ・カタパルトデッキを組み立てて発艦シーンを再現する回。",
+      locked: false,
+      questions: [
+        {
+          q: "押入れの奥から発掘された「限定版」のフィギュアセットは、何のガンダムの金銀2体セットだったか？",
+          choices: ["ゼータガンダム", "100式", "νガンダム", "Ζプラス"],
+          correct: 1,
+          explain: "正解は100式。「限定版100式ウイルスツイアクション累計出荷突破記念の金銀道3体セット」として、買った記憶がないまま押入れから出てきていた。"
+        },
+        {
+          q: "アーガマ・カタパルトデッキは、何スケールのモビルスーツに合わせて作られたものと紹介されていたか？",
+          choices: ["1/100スケール", "HG 1/144スケール", "1/60スケール", "MG 1/100スケール"],
+          correct: 1,
+          explain: "正解はHG 1/144スケール。「スケールは合ってる」「あれが14のHGだから」というやり取りで、HG1/144と組み合わせる商品だと確認していた。"
+        },
+        {
+          q: "このカタパルトデッキ商品に付けられていたエディション名は？",
+          choices: ["30周年記念エディション", "35周年記念エディション", "40周年アニバーサリーエディション", "45周年記念エディション"],
+          correct: 2,
+          explain: "正解は40周年アニバーサリーエディション。「40周年アニバーサリーエディションって書いてる」と箱に記載があった。"
+        },
+        {
+          q: "組み立てて完成させたカタパルトデッキの形態の名前は？",
+          choices: ["ドッキングモード", "フォートレスモード", "ランチモード", "デプロイモード"],
+          correct: 1,
+          explain: "正解はフォートレスモード。「フォートレスモードは完成よ」と、組み立てを終えた状態にその名前が使われていた。"
+        },
+        {
+          q: "このアーガマは、部屋のどこに設置する使い方も紹介されていたか？",
+          choices: ["天井", "壁", "床下", "玄関"],
+          correct: 1,
+          explain: "正解は壁。フックを使って「壁にアーガまがあるって」と、壁掛けディスプレイができる仕様が紹介されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "艦長級", line: "発艦シーケンスも積載スケールも完璧に把握した、まさにアーガマ艦長の采配。" },
+        { min: 4, badge: "航海士級", line: "十分な理解度。あと一押しで艦長に昇格だ。" },
+        { min: 3, badge: "甲板要員級", line: "基本装備はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "新任クルー級", line: "記憶がまだ曖昧なようだ。もう一度動画を見返してみよう。" },
+        { min: 0, badge: "迷い込んだ民間人級", line: "艦内はまだ把握しきれていない様子。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "delipicks-frozen-bento",
+      number: 38,
+      videoTitle: "【DELIPICKS】シェフのこだわりお弁当！手軽で美味しいレストランの味を実食！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=JzmLFeWNEmo",
+      blurb: "フレンチシェフ監修の冷凍宅配弁当DELIPICKSを、定番おかずから新登場の朝食メニューまでたっぷり実食する回。",
+      locked: false,
+      questions: [
+        {
+          q: "DELIPICKSのシェフの肩書として紹介されたのは「監修」ではなく何だったか？",
+          choices: ["総料理長", "監督", "プロデューサー", "顧問"],
+          correct: 1,
+          explain: "正解は監督。「ただの監修ではなく監督」と、レストランで食べられるような味を家庭で再現する立場として強調されていた。"
+        },
+        {
+          q: "今回新登場したと紹介された、朝食向けの新メニューは？",
+          choices: ["モーニングプレート", "モーニングオープンサンド", "朝食ボウル", "ブレックファストパスタ"],
+          correct: 1,
+          explain: "正解はモーニングオープンサンド。「朝を取るモーニングオープンサンドが登場」と紹介され、甘い系と食事系の2種類が実食された。"
+        },
+        {
+          q: "実際に食べたハンバーグにかかっていたソースは？",
+          choices: ["デミグラスソース", "トマトソース", "シャリアピンソース", "バルサミコソース"],
+          correct: 2,
+          explain: "正解はシャリアピンソース。「シャリアピンソース食べてみましょう。あ、美味しい」と実食し、好評だった。"
+        },
+        {
+          q: "おすすめメニューを提案してくれる独自の機能は何と呼ばれていたか？",
+          choices: ["自動レコメンド機能", "AIシェフ機能", "スマートメニュー機能", "パーソナルダイエット機能"],
+          correct: 0,
+          explain: "正解は自動レコメンド機能。「もう悩まなくていい。自動レコメンド機能を搭載」と、質問に答えるだけでおすすめが分かる仕組みが紹介されていた。"
+        },
+        {
+          q: "甘い系のオープンサンドに使われていた果物は？",
+          choices: ["バナナ", "いちご", "りんご", "洋梨"],
+          correct: 2,
+          explain: "正解はりんご。「香ばしく焼き上げたりんごを添え」「フランボワーズソースで酸味のアクセント」と、シナモン香るりんごのメニューだった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "星付きシェフ級", line: "すべての一皿を的確に評価できる、まさに舌の肥えたグルメ審査員。" },
+        { min: 4, badge: "料理研究家級", line: "十分に良い舌の記憶。あと一押しで満点だ。" },
+        { min: 3, badge: "お弁当マニア級", line: "基本の味はしっかり覚えている手堅い成績。" },
+        { min: 1, badge: "コンビニ飯派級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "味オンチ級", line: "味の記憶がだいぶ薄れている様子。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "newtype-1995-heroine10nen",
+      number: 39,
+      videoTitle: "【月刊ニュータイプ】ヒロイン10年史に異議あり!? 懐かしアニメが「きたきたきたきたーっ！」【1995年2月号】",
+      videoUrl: "https://www.youtube.com/watch?v=cvJh0gCQRK8",
+      blurb: "1995年2月号の月刊ニュータイプに掲載された「ヒロイン10年史」特集を読みながら、懐かしアニメの記憶を掘り起こす回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回読んだ特集記事のタイトルは「ヒロイン◯年史」だったか？",
+          choices: ["5年史", "10年史", "15年史", "20年史"],
+          correct: 1,
+          explain: "正解は10年史。「ヒロイン10年史か。ブランカの向こうから微笑みを投げかけて」という書き出しの特集記事だった。"
+        },
+        {
+          q: "声優が飲み屋でオーディション情報をもらい、翌日会場に行って合格したという逸話が紹介されたロボットアニメは？",
+          choices: ["コンバトラーV", "マジンガーZ", "ボルテスV", "ゲッターロボ"],
+          correct: 0,
+          explain: "正解はコンバトラーV。「そのオーディションに合格。コンバトラーVの主役として声優の仕事を開始」という体験談が紙面で紹介されていた。"
+        },
+        {
+          q: "「来い来い来い来い、来た来た来た来た」という決め台詞があると盛り上がっていたアニメは？",
+          choices: ["ガリバーボーイ", "レッドバロン", "勇者シリーズ", "魔法陣グルグル"],
+          correct: 0,
+          explain: "正解はガリバーボーイ。「ガリバーボーイのセリフです」と、必殺技を出す直前の決め台詞として紹介されていた。"
+        },
+        {
+          q: "F91のヒロインで、コウとの間で揺れ動き、自分勝手な行動から「評判が良くない」と話題になったキャラクターは？",
+          choices: ["セシリー", "クェス", "レコア", "ロザミア"],
+          correct: 0,
+          explain: "正解はセシリー。「その気持ちに振り回されてしまったけど」「当時から異議あったんだね」と、彼女の言動について盛り上がっていた。"
+        },
+        {
+          q: "記事を読みながら「まだこの時ないんだ」と話していた、後に名作として語られるアニメ映画は？",
+          choices: ["AKIRA", "ゴーストインザシェル", "パトレイバー劇場版", "天空の城ラピュタ"],
+          correct: 1,
+          explain: "正解はゴーストインザシェル。「ゴーストインザシェルまだこの時ないんだ」「やるとこ、今やるとこアニメ決定版続報って」と1995年時点ではまだ公開前だったことに気づいていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "アニメ文化財級", line: "90年代アニメの記憶を完璧に呼び覚ました、まさに生き字引の域。" },
+        { min: 4, badge: "懐アニ通級", line: "十分な知識量。あと一押しで文化財級だ。" },
+        { min: 3, badge: "再放送世代級", line: "基本はしっかり押さえている手堅い記憶力。" },
+        { min: 1, badge: "うろ覚え世代級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "平成生まれ級", line: "当時の空気感はこれから。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "backtothedawn-mamiya",
+      number: 40,
+      videoTitle: "【ゲスト：間宮 康弘】過酷な刑務所で生き残れ！ Back to the Dawn～ブレイク･ザ･アニマル･プリズン～で学ぶ “ムショの掟”【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=zsXIEk-x4JA",
+      blurb: "声優・間宮康弘さんをゲストに迎え、動物擬人化の脱獄RPG「Back to the Dawn」の世界観と、3つの生き残りテストに挑む回。",
+      locked: false,
+      questions: [
+        {
+          q: "ゲストの間宮康弘さんが担当したキャラクターの種族と役職は？",
+          choices: ["キツネの記者", "パンサーの潜入捜査官", "鳥の所長", "オオカミの囚人"],
+          correct: 1,
+          explain: "正解はパンサーの潜入捜査官。「パンサーボブと申します」「潜入捜査官のボブ」として紹介されていた。"
+        },
+        {
+          q: "このゲームが影響を受けた作品として紹介されたのは？",
+          choices: ["ショーシャンクの空に", "プリズンブレイクやアルカトラズからの脱出", "グリーンマイル", "es[エス]"],
+          correct: 1,
+          explain: "正解はプリズンブレイクやアルカトラズからの脱出。「テレビドラマ、プリズンブレイクや、映画、アルカトラズからの脱出などに影響を受けた」と紹介されていた。"
+        },
+        {
+          q: "テスト1「時間感覚」で、間宮さんが見せたお手本のタイムは？",
+          choices: ["9秒50", "10秒00", "10秒84", "11秒20"],
+          correct: 2,
+          explain: "正解は10秒84。ストップウォッチを10秒ぴったりで止めるテストで、まみやさんは見事「10秒84」というお手本を披露した。"
+        },
+        {
+          q: "テスト3「運の強さ」で使われた勝負道具は？",
+          choices: ["トランプ", "ダイス（サイコロ）", "コイントス", "じゃんけん"],
+          correct: 1,
+          explain: "正解はダイス（サイコロ）。「勝負に使うのはこちら。ダイスです」と、ちんちろのルールで運試しをしていた。"
+        },
+        {
+          q: "このゲームのPlayStation5版はいつ発売予定と紹介されていたか？",
+          choices: ["2026年内に発売予定", "発売未定", "2025年内に発売済み", "2027年発売予定"],
+          correct: 0,
+          explain: "正解は2026年内に発売予定。「Playstation5も2026年に発売予定となっております」と紹介されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "模範囚（生き抜くコツ皆伝）級", line: "時間感覚・嗅覚・運、すべてのテストを完全に理解した模範囚。" },
+        { min: 4, badge: "信頼される囚人級", line: "十分な適応力。あと一押しで皆伝だ。" },
+        { min: 3, badge: "新入り囚人級", line: "基本はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "独房送り予備軍級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "看守に目をつけられた級", line: "生き抜くコツはこれから習得だ。もう一度挑戦。" }
+      ]
+    },
+    {
+      id: "dq-wafers-loto-trilogy",
+      number: 41,
+      videoTitle: "【ドラクエ】勇者描き下ろしがアツい！ DQウエハース開封！【ロト三部作】",
+      videoUrl: "https://www.youtube.com/watch?v=wDw1-aRhz7g",
+      blurb: "ドラゴンクエスト ロト三部作HD-2Dリメイクに合わせて発売されたウエハースを2箱開封し、コンプを目指す回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回のウエハースは、何のリメイク版に合わせて発売されたものだったか？",
+          choices: ["ドラゴンクエストIII単体のリメイク", "ロト三部作のHD-2Dリメイク", "ドラゴンクエストXIのリメイク", "ドラゴンクエストビルダーズ"],
+          correct: 1,
+          explain: "正解はロト三部作のHD-2Dリメイク。「ロト、ワンツースリーが、まあリマスタ、リメイクされたからそれに合わせて出たっぽい」と紹介されていた。"
+        },
+        {
+          q: "最高レアリティ「スペシャルレアカード」は全部で何種類あると話していたか？",
+          choices: ["2種", "3種", "5種", "10種"],
+          correct: 1,
+          explain: "正解は3種。「シークレットのやつ3種しかないスペシャルレアカードです」と紹介されていた。"
+        },
+        {
+          q: "動画内で最初に引いたスペシャルレアカードに描かれていたキャラクターは？",
+          choices: ["竜王", "ローレシアの王子", "サマルトリアの王子", "勇者アレフガルド"],
+          correct: 1,
+          explain: "正解はローレシアの王子。「スペシャルレアカードナンバー3のローレシアの王子」を1箱目からいきなり引き当てていた。"
+        },
+        {
+          q: "今回は何箱購入して開封に挑んだか？",
+          choices: ["1箱", "2箱", "3箱", "5箱"],
+          correct: 1,
+          explain: "正解は2箱。「これに関しては2箱だけ買ってみたんで」と話していた。"
+        },
+        {
+          q: "最終的にコンプリートはできたか？",
+          choices: ["できた", "あと1種のところでできなかった", "半分も引けなかった", "1箱だけで達成した"],
+          correct: 1,
+          explain: "正解はあと1種のところでできなかった。「昆布（コンプ）は無理です」と、ラスト1種が出ずに悔しがっていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "ロトの血を引く者級", line: "伝説の勇者さながらの強運。全種を見事に集め切った。" },
+        { min: 4, badge: "サマルトリアの王子級", line: "十分な強運。あと一押しでロトの紋章コンプだ。" },
+        { min: 3, badge: "はぐれメタル級", line: "基本はしっかり押さえている手堅い戦績。" },
+        { min: 1, badge: "スライム級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "ホイミスライム級", line: "経験値はまだわずか。もう一度挑戦しよう。" }
+      ]
+    },
+    {
+      id: "cityhunter-coltpython-tanaka",
+      number: 42,
+      videoTitle: "【シティーハンター】原画展で冴羽獠の愛銃ゲット！気分は最強スイーパー！【コルトパイソン】",
+      videoUrl: "https://www.youtube.com/watch?v=nV2H8Rf_Z0I",
+      blurb: "シティハンター原画展のグッズを紹介しつつ、40周年記念の田中製コルトパイソン・サイバー涼モデルを徹底解説する回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回開封したコルトパイソンのモデルガンはどのメーカーが発売したものか？",
+          choices: ["マルシン", "タナカ（田中ワークス）", "コクサイ", "ハートフォード"],
+          correct: 1,
+          explain: "正解はタナカ（田中ワークス）。「田中のモデルガンですね」「田中だと」というやり取りで確認できる。"
+        },
+        {
+          q: "このモデルガンの価格として紹介されたのは？",
+          choices: ["2万8000円", "3万8000円", "4万8000円", "5万8000円"],
+          correct: 1,
+          explain: "正解は3万8000円。「3万8000円」とはっきり言及されていた。"
+        },
+        {
+          q: "このモデルは何周年記念モデルとして発売されたか？",
+          choices: ["35周年", "40周年", "45周年", "50周年"],
+          correct: 1,
+          explain: "正解は40周年。「今40周年モデルが発売されました」とシティハンター40周年モデルとして紹介されていた。"
+        },
+        {
+          q: "銃を傷めずに安全に空撃ちするために付属していたパーツは？",
+          choices: ["専用オイル", "空打ち専用スプリング", "予備の撃鉄", "消音マフラー"],
+          correct: 1,
+          explain: "正解は空打ち専用スプリング。「カード打ちスプリング入ってる」と、空撃ちによる本体破損を防ぐパーツが付属していた。"
+        },
+        {
+          q: "このモデルガンを発火させるための火薬の種類は？",
+          choices: ["火薬ペレット式", "キャップ式", "カートリッジ式", "液体燃料式"],
+          correct: 1,
+          explain: "正解はキャップ式。「これはキャップ契約でしょ？」「全部キャップですよ」と確認していた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "最強スイーパー級", line: "リボルバーのロールスロイスと呼ばれる銃の細部まで完全掌握。まさに冴羽獠の域。" },
+        { min: 4, badge: "凄腕ガンスミス級", line: "十分な知識量。あと一押しでスイーパー級だ。" },
+        { min: 3, badge: "見習いスイーパー級", line: "基本はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "依頼人級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "モコリ厳禁級", line: "銃の知識はこれから。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "cityhunter-daigengaten-mokkori",
+      number: 43,
+      videoTitle: "【シティーハンター】狂気の“もっこりオンリーシール”開封！ 原画展限定グッズ買ってきた！【大原画展】",
+      videoUrl: "https://www.youtube.com/watch?v=5_E5VNlNuCs",
+      blurb: "シティハンター大原画展フォーエバーで購入したグッズ紹介の第2弾。目玉のもっこりステッカーコレクションで大盛り上がりする回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回の目玉として紹介された、サイバー涼のシーンを集めたステッカーコレクションは全何種類？",
+          choices: ["10種", "18種", "24種", "30種"],
+          correct: 1,
+          explain: "正解は18種。「全18サイバー涼の詰め合わせ」と紹介され、二人でどちらのステッカーがより「強い」かを競い合っていた。"
+        },
+        {
+          q: "海坊主とミキのペアで販売されていたグッズは何だったか？",
+          choices: ["キーホルダー", "フレグランス（香水）", "マグカップ", "タオル"],
+          correct: 1,
+          explain: "正解はフレグランス（香水）。「海坊主＆ミキフレグランス。なんと香水」と、恋人同士で使う想定のペア商品として紹介されていた。"
+        },
+        {
+          q: "喫茶キャッツアイをイメージした香りグッズとして紹介されたのは？",
+          choices: ["アロマディフューザー", "お香セット", "キャンドル", "ハンドクリーム"],
+          correct: 0,
+          explain: "正解はアロマディフューザー。「こちらがアロマディフューザーとなっております」と紹介され、香水の詰め替え用として使うことにしていた。"
+        },
+        {
+          q: "コーヒーカップがくるくる回る仕組みとして紹介されていたのは？",
+          choices: ["電池モーター", "磁力", "ベアリング", "ゼンマイ"],
+          correct: 2,
+          explain: "正解はベアリング。「ベアリングでね回るように作られてた」と、電池なしで手回しで回る仕組みだと説明されていた。"
+        },
+        {
+          q: "「墓場のガロ」Tシャツについて、実際に売られていた色は？",
+          choices: ["黒のみ", "白のみ", "黒と白の2色", "カラフルな全4色"],
+          correct: 1,
+          explain: "正解は白のみ。「俺黒ティしか着ないんですよ。でもね、これ白しかないんすよね」と、黒派なのに白しかない状況を嘆いていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "もっこり研究家級", line: "18種のステッカーの強さを完全に見極めた、真のシティハンター通。" },
+        { min: 4, badge: "原画展常連級", line: "十分な知識量。あと一押しで研究家級だ。" },
+        { min: 3, badge: "グッズコレクター級", line: "基本はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "一見さん級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "環境型セクハラ注意級", line: "グッズの知識はこれから。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "gquuuuuux-ichibankuji-metalrobot",
+      number: 44,
+      videoTitle: "【ジークアックス】ラストワン賞、覚醒！GQuuuuuuX一番くじ開けてみた！【ROBOT魂】",
+      videoUrl: "https://www.youtube.com/watch?v=g_K3EacvsSo",
+      blurb: "『機動戦士Gundam GQuuuuuuX』の一番くじを大量開封し、メタルロボット魂の赤いガンダム・白いガンダム・ジークアックスもいじり倒す回。",
+      locked: false,
+      questions: [
+        {
+          q: "一番くじのA賞・ラストワン賞に共通していたフィギュアシリーズ名は？",
+          choices: ["ROBOT魂", "BUSTISAN（バスティさん）", "メタルビルド", "フィギュアライズ"],
+          correct: 1,
+          explain: "正解はBUSTISAN（バスティさん）。「一番くじ共同フィギュアシリーズ、バスティさん」と紹介され、A賞とラストワン賞がともに胸像フィギュアだった。"
+        },
+        {
+          q: "ラストワン賞のフィギュアは、通常フォルムに対しどんな状態を再現していたか？",
+          choices: ["変形合体した状態", "エンディミオンユニット覚醒状態（口と目が開いた状態）", "カラーバリエーション違い", "ダメージを受けて損壊した状態"],
+          correct: 1,
+          explain: "正解はエンディミオンユニット覚醒状態。「覚醒した時の顔が開いてんですよ」「口パッカー目もパッカー」と、通常版との違いを実際に組み替えて見せていた。"
+        },
+        {
+          q: "D賞として紹介されたグッズは何だったか？",
+          choices: ["モビルスーツヘッドマグネット", "缶バッジコレクション", "アクリルスタンド", "クリアファイル"],
+          correct: 0,
+          explain: "正解はモビルスーツヘッドマグネット。「モビルスーツヘッドマスマグネット」として、壁に貼り付けるマグネットグッズが紹介されていた。"
+        },
+        {
+          q: "メタルロボット魂の赤いガンダムのバックパックに取り入れられていたデザインは？",
+          choices: ["コアファイター", "フルアーマー用ジョイント", "増加装甲マウント", "ビームサーベルラック"],
+          correct: 0,
+          explain: "正解はコアファイター。「コアファイターがあるよね」「一応意識してると思うよ」と、初代ガンダムを踏まえたデザインだと気づいていた。"
+        },
+        {
+          q: "開封した3体のメタルロボット魂は「赤いガンダム」「ジークアックス」ともう1体は？",
+          choices: ["白いガンダム", "νガンダム", "νガンダムHWS", "デスティニーガンダム"],
+          correct: 0,
+          explain: "正解は白いガンダム。「赤いガンダム、白いガンダム、そしてジークアックス」の3体を系列順に開封していた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "ラストワン賞級", line: "エンディミオンユニット覚醒並みの完全制覇。もはや自らも目覚めたレベル。" },
+        { min: 4, badge: "A賞級", line: "十分な引きの強さ。あと一押しでラストワンだ。" },
+        { min: 3, badge: "D賞級", line: "基本はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "H賞級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "ハズレ空箱級", line: "引きの記憶がだいぶ薄れている様子。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "roulette-6th-anniversary-announcement",
+      number: 45,
+      videoTitle: "わしゃがなTVから重要なお知らせ",
+      videoUrl: "https://www.youtube.com/watch?v=nEYm71ho0Yc",
+      blurb: "ルーレットで会場候補をあおりつつ、6周年記念リアルイベントの開催情報を発表する回。",
+      locked: false,
+      questions: [
+        {
+          q: "リアルイベントの会場候補としてルーレットに挙げられた都市に含まれていなかったのは？",
+          choices: ["ニューヨーク", "ロンドン", "東京", "パリ"],
+          correct: 2,
+          explain: "正解は東京。「ニューヨーク、ロサンゼルス、ロンドン、パリー」の4都市がルーレットの候補として読み上げられ、東京は候補になかった。"
+        },
+        {
+          q: "会場を決めるルーレットを回した結果、出た目は何だった？",
+          choices: ["特賞", "スーパーレア", "ハズレ", "ジャックポット"],
+          correct: 1,
+          explain: "正解はスーパーレア。「あ、つまりスーパーレア」「俺たちのラックは絶好調だぜ」というやり取りで、出た目はスーパーレアだった。"
+        },
+        {
+          q: "今回発表されたリアルイベントは、わしゃがなTVにとって何周年記念の公演か？",
+          choices: ["4周年", "5周年", "6周年", "7周年"],
+          correct: 2,
+          explain: "正解は6周年。動画概要欄に「わしゃがなTV　6周年リアルイベント開催決定!!」と明記されている。"
+        },
+        {
+          q: "動画概要欄に記載されたリアルイベントの開催地はどこか？",
+          choices: ["東京・日本武道館", "大阪・梅田芸術劇場", "名古屋国際会議場", "福岡サンパレス"],
+          correct: 1,
+          explain: "正解は大阪・梅田芸術劇場。概要欄に「開催地：大阪・梅田芸術劇場」と記載されている。"
+        },
+        {
+          q: "チケットの先行抽選申し込みは何月何日開始予定と発表されたか？",
+          choices: ["4月2日", "5月2日", "6月2日", "7月2日"],
+          correct: 1,
+          explain: "正解は5月2日。「チケットの抽選申し込みは5月2日開始予定だ」と案内され、概要欄にも「2026年5月2日（土）チケット先行抽選開始」と記載されている。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "ジャックポット級", line: "ルーレット運も記憶力も絶好調。まさにスーパーレアな成績。" },
+        { min: 4, badge: "スーパーレア級", line: "十分な引きの強さ。あと一押しでジャックポットだ。" },
+        { min: 3, badge: "レア級", line: "基本はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "ノーマル級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "ハズレ級", line: "お知らせの中身がまだ入っていない様子。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "akinator-unmei-no-aite",
+      number: 46,
+      videoTitle: "【アキネイター】魔人再び！2026年のわしらにマッチングする運命の人は誰だ！？【運命の人探し】",
+      videoUrl: "https://www.youtube.com/watch?v=qnsv5rrKaQI",
+      blurb: "伝説の“原始グラードン事件”から数年、アキネイターに再挑戦して自分たちの運命の相手を占う回。",
+      locked: false,
+      questions: [
+        {
+          q: "中村さんの伝説の「運命の相手」として何度も言及されたポケモンは？",
+          choices: ["原始グラードン", "原始カイオーガ", "メガレックウザ", "ミュウツー"],
+          correct: 0,
+          explain: "正解は原始グラードン。「俺の運命の相手…原子グラードン」「業界に衝撃を与えた」と、伝説の事件として何度も振り返られていた。"
+        },
+        {
+          q: "中村さんの2次元キャラクター診断で的中したのは、『デート・ア・ライブ』に登場する誰？",
+          choices: ["時崎狂三", "夜刀神十香", "四糸乃", "誘宵美九"],
+          correct: 0,
+          explain: "正解は時崎狂三（くるみ）。「くるみじゃん」「共像って呼んでたけど」というやり取りで、『デート・ア・ライブ』の時崎狂三が的中していた。"
+        },
+        {
+          q: "梶田さんが最後に「動物」枠で挑戦した結果、的中したのは？",
+          choices: ["狐", "猫", "犬", "うさぎ"],
+          correct: 0,
+          explain: "正解は狐。「ちゃんと狐が出るんだ」と、耳の長さや毛の質感などのヒントから狐に行き着いていた。"
+        },
+        {
+          q: "梶田さんの1回目の「運命の相手」診断で最終的に的中したのは、どんな傾向のキャラクターだったか？",
+          choices: ["海外アニメの悪魔系キャラ", "国内アイドルアニメのキャラ", "戦国武将キャラ", "スポーツ漫画のヒロイン"],
+          correct: 0,
+          explain: "正解は海外アニメの悪魔系キャラ。「海外のアニメで悪魔ってきたら」「チェリーボムが出るんだろうな」というやり取りで的中していた。"
+        },
+        {
+          q: "今回のアキネイター企画は、前回の挑戦から何年ぶりの再戦だったか？",
+          choices: ["2年ぶり", "4年ぶり", "6年ぶり", "8年ぶり"],
+          correct: 1,
+          explain: "正解は4年ぶり。「4年前ってだいぶやられてたね、こいつ」と、久々の再戦だったことが話されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "完全一致級", line: "アキネイターすら唸る的中率。まさに運命の相手を完全に導き出した。" },
+        { min: 4, badge: "高相性級", line: "十分な的中度。あと一押しで完全一致だ。" },
+        { min: 3, badge: "部分一致級", line: "基本はしっかり押さえている手堅い記憶力。" },
+        { min: 1, badge: "データ汚染級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "原始グラードン級（迷走）", line: "データがぐちゃぐちゃになっている様子。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "darthvader-hottoys-battledamage",
+      number: 47,
+      videoTitle: "【スター・ウォーズ】ベイダー満身創痍！？ ダース・ベイダー バトルダメージ デラックス版を開封！【ホットトイズ】",
+      videoUrl: "https://www.youtube.com/watch?v=5gGWpdtwfKo",
+      blurb: "注文と違って届いた「ダース・ベイダー バトルダメージ デラックス版」を、まさかの梶田さんの新素体候補として開封する回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回、注文と違って誤って届いてしまったのは何のデラックス版だったか？",
+          choices: ["ストームトルーパー", "ダース・ベイダー（バトルダメージ版）", "ボバ・フェット", "ダース・モール"],
+          correct: 1,
+          explain: "正解はダース・ベイダー（バトルダメージ版）。「ダメージバージョンのダースベイダー」が、本来頼んだはずのものとは違う形で開封されていた。"
+        },
+        {
+          q: "この商品の価格として紹介されたのは？",
+          choices: ["2万8000円", "3万8000円", "4万8000円", "5万8000円"],
+          correct: 1,
+          explain: "正解は3万8000円。「3万8000」とはっきり言及されていた。"
+        },
+        {
+          q: "最近のホットトイズは電池ではなく、何で給電するタイプになっていたか？",
+          choices: ["ソーラー充電", "USB Type-C", "乾電池パック式", "ワイヤレス充電"],
+          correct: 1,
+          explain: "正解はUSB Type-C。「もう電池じゃなくなったんだね」「タイプCあります」と、台座にUSB Type-Cの差込口があった。"
+        },
+        {
+          q: "このダースベイダーのヘルメットに搭載されていたギミックは？",
+          choices: ["音声が流れる", "目がクリクリ動く", "マントが自動で開く", "口元が発光する"],
+          correct: 1,
+          explain: "正解は目がクリクリ動く。裏側のネジを外して操作すると「これでくリくリ動かせる」と目線を動かせるギミックが確認された。"
+        },
+        {
+          q: "最終的にこのボディは、梶田さんの新しい素体として採用されたか？",
+          choices: ["採用され即戦力になった", "顔の綺麗さとボディの傷が噛み合わず見送りになった", "値段が高すぎて返品した", "中村さんが持ち帰った"],
+          correct: 1,
+          explain: "正解は見送りになった。「ボディの破損と顔の綺麗さが噛み合わないってことでね、見送りで」という結論に落ち着いた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "暗黒卿級", line: "フォースの力を完全に掌握。満身創痍の姿すら完璧に使いこなす貫禄。" },
+        { min: 4, badge: "シスの弟子級", line: "十分な理解度。あと一押しで暗黒卿だ。" },
+        { min: 3, badge: "帝国軍将校級", line: "基本はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "ストームトルーパー級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "反乱同盟スパイ級", line: "暗黒面への理解はこれから。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "ld-collection-from-k",
+      number: 48,
+      videoTitle: "【レーザーディスク】激レアから激ヤバまで！誕生日にもらったLDの宝箱を開ける！【私物紹介】",
+      videoUrl: "https://www.youtube.com/watch?v=Ahp9pigCDBA",
+      blurb: "視聴者Kさんから譲り受けた大量のLDコレクションを、名作映画からマニアックなアニメ・ゲーム実況LDまで次々に開封していく回。",
+      locked: false,
+      questions: [
+        {
+          q: "Kさんからもらったコレクションの中で、ジェームズ・キャメロン監督直筆のコメントが封入されていたLDは何の作品？",
+          choices: ["ブレードランナー", "ゴーストインザシェル（攻殻機動隊）", "エイリアン2", "ターミネーター2"],
+          correct: 1,
+          explain: "正解はゴーストインザシェル（攻殻機動隊）。「これがジェームズキャメロンおそらく原点のコメント」と、映画への絶賛コメントが同梱されていた。"
+        },
+        {
+          q: "「ソルバルー」「スターブレード」に共通する、当時のLDならではの珍しいジャンルは何だったか？",
+          choices: ["カラオケ映像専用LD", "アーケードゲームのプレイ映像だけを収録したLD", "料理番組LD", "語学学習LD"],
+          correct: 1,
+          explain: "正解はアーケードゲームのプレイ映像だけを収録したLD。「スタートからエンディングまでのプレイ画面を収録」した、いわば当時のゲーム実況動画のようなものだった。"
+        },
+        {
+          q: "成人向けアニメ「クリームレモン」のLDパッケージに施されていた、成人指定マークのユニークなデザインは何をモチーフにしていたか？",
+          choices: ["麻雀の牌（チー・タンヤオ）", "トランプのジョーカー", "花札", "サイコロ"],
+          correct: 0,
+          explain: "正解は麻雀の牌。「成人指定マークが麻雀みたいになってる」「ち対イツですよ」と、麻雀の役になぞらえたデザインに驚いていた。"
+        },
+        {
+          q: "最後に紹介された「クリームレモン」全巻セットの内容は？",
+          choices: ["ドラマパートを含む完全版", "エッチシーンだけを集めた総集編", "未公開シーンのみの特典映像集", "アフレコ収録の裏側映像"],
+          correct: 1,
+          explain: "正解はエッチシーンだけを集めた総集編。「エッシーンのアニメ映像やセルガだけを総集で得られてこれは」と紹介されていた。"
+        },
+        {
+          q: "今回紹介されたLDコレクションは、そもそも誰から譲り受けたものだったか？",
+          choices: ["取引先のバンダイの人", "視聴者のKさん", "昔の同級生", "中村さんの知人の声優"],
+          correct: 1,
+          explain: "正解は視聴者のKさん。誕生日の配信でLDをプレゼントしてもらったスタッフ経由で、視聴者のKさんから大量のコレクションが送られてきていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "LDマスター級", line: "名作からマニアックなゲーム実況LDまで完全把握。まさにKさんに匹敵するコレクター魂。" },
+        { min: 4, badge: "コレクター見習い級", line: "十分な知識量。あと一押しでマスター級だ。" },
+        { min: 3, badge: "レンタル世代級", line: "基本はしっかり押さえている手堅い記憶力。" },
+        { min: 1, badge: "配信世代級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "LDプレイヤー未所持級", line: "再生機すら持っていない様子。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "livlyisland-coordinate-battle",
+      number: 49,
+      videoTitle: "【リヴリーアイランド】癒しの一品お待ち！ わしらのガチンコラーメン対決！？【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=W1zZAPY7FZ0",
+      blurb: "前回好評だった「リヴリーアイランド」の第2弾。「癒し」をテーマにコーディネートバトルを繰り広げたら、まさかの深夜ラーメン対決になった回。",
+      locked: false,
+      questions: [
+        {
+          q: "リヴリーは何のうんちをする生き物として紹介されているか？",
+          choices: ["土", "鉱石（宝石）", "花の種", "水晶の粉"],
+          correct: 1,
+          explain: "正解は鉱石（宝石）。「リヴリーは錬金術から生まれた不思議な生物で鉱石のうんちをします」と紹介されていた。"
+        },
+        {
+          q: "梶田さんが最初「うんち」だと勘違いしていたアイテムの正体は？",
+          choices: ["箸置き", "小さな置物", "石鹸", "消しゴム"],
+          correct: 0,
+          explain: "正解は箸置き。「これうんちかな？」と疑っていたが、正体は「箸置きだそうです」と判明した。"
+        },
+        {
+          q: "今回のコーディネートバトルのテーマは何だったか？",
+          choices: ["宇宙", "癒し", "青春", "冒険"],
+          correct: 1,
+          explain: "正解は癒し。「テーマは癒しです」と発表され、それぞれが考える癒しの空間を作ることになった。"
+        },
+        {
+          q: "梶田さんが作った空間に置いたラーメンは何味だったか？",
+          choices: ["味噌ラーメン", "塩ラーメン", "蒙古タンメン（激辛）", "豚骨ラーメン"],
+          correct: 2,
+          explain: "正解は蒙古タンメン（激辛）。「蒙古タンメン中本なんすよ」「辛いの足りない人はどんどん足してくれ」という激辛コンセプトの空間を作っていた。"
+        },
+        {
+          q: "視聴者投票の結果、どちらのラーメン（空間）が勝利したか？",
+          choices: ["梶田さんの激辛ラーメンが圧勝", "中村さんの醤油ラーメンが僅差で勝利", "同票で引き分け", "どちらも不評だった"],
+          correct: 1,
+          explain: "正解は中村さんの醤油ラーメンが僅差で勝利。「6対4で今回、中（村さんの）ラーメンです」という結果になった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "癒しマスター級", line: "レイヤー配置まで完璧に使いこなす、リヴリーアイランド世界一の癒し空間デザイナー。" },
+        { min: 4, badge: "インテリア上級者級", line: "十分なセンス。あと一押しでマスター級だ。" },
+        { min: 3, badge: "見習いデザイナー級", line: "基本はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "配置迷子級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "深夜ラーメン中毒級", line: "癒しよりラーメンが気になっている様子。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "akedo-booster-battlefield",
+      number: 50,
+      videoTitle: "【アケド】強化パックてんこ盛り！ ブースターでレアAKEDOを引き当てろ！【バトルホビー】",
+      videoUrl: "https://www.youtube.com/watch?v=d-NRibifUpI",
+      blurb: "アーケード筐体型バトルフィールドを手に入れ、ブースターパックを大量開封しながらAKEDOのレアリティ対決に挑む回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回登場したバトルフィールドは、何を模したデザインだったか？",
+          choices: ["アーケードゲーム筐体", "忍者屋敷", "闘技場コロシアム", "宇宙ステーション"],
+          correct: 0,
+          explain: "正解はアーケードゲーム筐体。「日本のアーケードゲームから着想を得た」と説明があり、対戦音楽やHPゲージ表示まで再現されていた。"
+        },
+        {
+          q: "大きなキャリーバッグ型のグッズは、何として使えると紹介されたか？",
+          choices: ["専用の充電ケース", "友達の家に持ち運べる収納・キャリーケース", "トレーディングカードファイル", "展示用のショーケース"],
+          correct: 1,
+          explain: "正解は収納・キャリーケース。「友達の家に行く時にこれを持ってこう」と、コントローラーごと持ち運べる仕様として紹介されていた。"
+        },
+        {
+          q: "レアリティの中で「1体しか存在しない」と紹介された最高レアの名前は？",
+          choices: ["エクスクルーシブウルトラレア", "レジェンダリー", "ファインド・ザ・リミテッドエディション ミスティカルストームストライク", "メガレア"],
+          correct: 2,
+          explain: "正解はファインド・ザ・リミテッドエディション ミスティカルストームストライク。「これがもう1体しかいない」と紹介され、名前の長さにも二人でツッコんでいた。"
+        },
+        {
+          q: "中村さんが引いたキャラクター「チャック3」は誰に似ていると言われたか？",
+          choices: ["中村さん本人", "梶田さん", "スタッフ", "有名芸能人"],
+          correct: 1,
+          explain: "正解は梶田さん。「長さんに似てる」「チャック3、長さんに似てますね」と、そのまま持ちキャラにしてはと勧められていた。"
+        },
+        {
+          q: "対戦で圧倒的な差がついた原因として二人が結論づけたのは何だったか？",
+          choices: ["キャラクターの体格差", "武器の性能差（武器ゲー）", "フィールドの相性", "運の差だけ"],
+          correct: 1,
+          explain: "正解は武器の性能差（武器ゲー）。「武器の性能差高すぎんか？」「結局これ武器だな」と、キャラより装備の強さが勝敗を左右すると結論づけていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "ミスティカルストームストライク級", line: "1体限定の最高レアばりの完璧な引き。もはや伝説の戦士。" },
+        { min: 4, badge: "レジェンダリー級", line: "十分な強さ。あと一押しで最高レアだ。" },
+        { min: 3, badge: "エピック級", line: "基本はしっかり押さえている手堅い成績。" },
+        { min: 1, badge: "レア級", line: "記憶がまだ曖昧なようだ。もう一度見返してみよう。" },
+        { min: 0, badge: "クラシック級", line: "記憶の引きはこれから。もう一度挑戦だ。" }
+      ]
+    },
+    {
+      id: "arsenal-base-echoes-beat-pr",
+      number: 51,
+      videoTitle: "【機動戦士ガンダム アーセナルベース】新たな力「エコーズビート」で戦場を駆けろ！ わしらと見る 新たなるアセベの世界【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=RS4k5dAIpEw",
+      blurb: "バンダイ提供で「機動戦士ガンダムアーセナルベース」の新シーズンを紹介する回。ゲストの大岩プロデューサーを迎え、新要素「エコーズビート」やレアカードの数々を解説してもらいながら、二人だけの特製デッキで白熱のデモバトルを観戦する。",
+      locked: false,
+      questions: [
+        {
+          q: "今回のゲストとして登場したバンダイの「大岩プロデューサー」、自己紹介で明かしたバンダイでの年齢は何歳だった？",
+          choices: ["30歳", "25歳", "28歳", "33歳"],
+          correct: 0,
+          explain: "正解は30歳。大岩さんは「ありがとうございます。30歳になりました」と自己紹介し、バンダイではアーセナルベースだけを担当していると話していた。"
+        },
+        {
+          q: "2026年2月26日から稼働を開始した、アーセナルベースの新シリーズの名称は？",
+          choices: ["フォースクワッド", "ウェイブエコーズ(WAVECHOES)", "スプリングフェスティバル", "Vブースター"],
+          correct: 1,
+          explain: "正解はウェイブエコーズ。「新シリーズ、ウェイブエコーズシーズン01では新たにガンダムシードフリーダムよりデスティニーガンダムスペックや、機動戦士ガンダムジークアクスよりガンダムなどが新規参戦」と紹介された。"
+        },
+        {
+          q: "新要素「エコーズビート」で、共鳴戦術技（必殺技）を発動させるにはエコーズビートレベルをいくつまで貯める必要がある？",
+          choices: ["1", "2", "3", "5"],
+          correct: 2,
+          explain: "正解は3。「エコーズビートレベル。戦術技を打つたびにレベルが上がっていき、最大でこの3を一気に0まで下げることで必殺技が出せる」と説明された。"
+        },
+        {
+          q: "5年目を迎えたアーセナルベースのテーマソング「5TELLA（ステラ）」を歌っているアーティストは？",
+          choices: ["L'Arc-en-Ciel", "水樹奈々", "ELISA", "FLOW"],
+          correct: 3,
+          explain: "正解はFLOW。番組内で「今回5年目のテーマソングはフローさんにお願いしております」と紹介され、実際にFLOWの新曲「5TELLA」がテーマソングに起用されている。"
+        },
+        {
+          q: "撮影用に持ち込まれた「エルメス」のカードに入っていた特別な仕様は？",
+          choices: ["シリアルナンバー入り（00番）", "金箔押し加工", "サイン入り", "ホログラム加工"],
+          correct: 0,
+          explain: "正解はシリアルナンバー入り（00番）。「エルメスの方が実はシリアルナンバーが入っておりまして」「撮影用に00番を持ってきた」と説明され、超レアなカードとして紹介された。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "共鳴戦術技発動級", line: "3回目の登場でも色褪せない、まさに指揮官の中の指揮官。" },
+        { min: 4, badge: "エコーズビート持続中", line: "戦術技をテンポよく重ねられる優秀なオペレーター。" },
+        { min: 3, badge: "デッキ構築見習い", line: "基本は押さえている。あと一押しで必殺技が出せる。" },
+        { min: 1, badge: "初陣パイロット", line: "戦場には出たものの、まだまだ経験不足。" },
+        { min: 0, badge: "出撃前に撃破", line: "残念、次回の作戦会議に期待しよう。" }
+      ]
+    },
+    {
+      id: "online-gashapon-kaworu-exhibit-dragonball-charm",
+      number: 52,
+      videoTitle: "【オンラインガシャポン】エヴァダサセーターで猛烈アピール！？ &コレクション難易度高めドラゴンボールチャーム！【渚カヲル展】",
+      videoUrl: "https://www.youtube.com/watch?v=QgkJCcJbh4A",
+      blurb: "溜まっていたオンラインガシャポンの戦利品を開封しつつ、「渚カヲル展」限定グッズやコレクション難度の高いドラゴンボールのアクリルスタンドチャームも紹介する私物回。中村さんが購入したカヲル君モチーフのTシャツとセーターを実際に着てアピールする場面も。",
+      locked: false,
+      questions: [
+        {
+          q: "中村さんが「渚カヲル展」で購入し、実際に着てアピールしていたセーターには何と書かれていた？",
+          choices: ["アイムシンジ", "アイムカヲル", "アイムアヤナミ", "アイムゲンドウ"],
+          correct: 1,
+          explain: "正解はアイムカヲル。セーターの語を読んでほしいと言われ「アイムカヲルって書いてあります」と紹介、中村さんが着て「もう総然となります」とアピールしていた。"
+        },
+        {
+          q: "ドラゴンボールのアクリルスタンドチャーム（コレクション2）、全種を最短でコンプするには何回ガチャを回す必要があると話していた？",
+          choices: ["10回", "12回", "14回", "18回"],
+          correct: 2,
+          explain: "正解は14回。「これ最短14回なんだよ、全部ばらけて」「自力コンプは無理でしょ、この数」と話していた。"
+        },
+        {
+          q: "フリーレンの「待ちぼけ」ガチャで、ミミック（ミック）のフィギュアはどんな状態で再現されていた？",
+          choices: ["逃げている状態", "眠っている状態", "戦っている状態", "（魔物に）食べられている状態"],
+          correct: 3,
+          explain: "正解は食べられている状態。ミミックについて「食われてる」「食われた状態で待ちぼけ」と説明されていた。"
+        },
+        {
+          q: "渚カヲル展のラミカ（ラミネートカード）コレクションは全何種類だった？",
+          choices: ["全16種", "全8種", "全24種", "全12種"],
+          correct: 0,
+          explain: "正解は全16種。「全16種コンプセットだったんでありがたいことに全部見れました」とブラインドではなく全種入りのセットだったと説明されていた。"
+        },
+        {
+          q: "初音ミクカラーのガンダムプラモは、何のモビルスーツをベースにしていた？",
+          choices: ["ジム", "ザク", "グフ", "ドム"],
+          correct: 1,
+          explain: "正解はザク。「ミクのザはなんかもうほとんど普通のザだな。緑色だし」と話しており、初音ミクカラーのザクだったことが分かる。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "シークレット引き当て勢", line: "台の前に100円玉を積む覚悟すら感じる圧倒的引き強。" },
+        { min: 4, badge: "レア確定勢", line: "かなりの強運。ダブりも少なそう。" },
+        { min: 3, badge: "ノーマル安定勢", line: "堅実にコンプを狙えるちょうどいい強さ。" },
+        { min: 1, badge: "ダブり多発勢", line: "気づけば同じ景品ばかり。神様は少し意地悪。" },
+        { min: 0, badge: "ハズレ在庫処分要員", line: "残念、また台の前に並び直そう。" }
+      ]
+    },
+    {
+      id: "arknights-endfield-pr",
+      number: 53,
+      videoTitle: "【アークナイツ：エンドフィールド】安全確認ヨシ！ わしらが工業で新天地で工場建設！？【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=VzYlpN95ryo",
+      blurb: "GRYPHLINE提供で完全新作RPG「アークナイツ：エンドフィールド」を紹介する回。中村さんがPC版のチュートリアルをプレイし、送電網の構築や図面システムを使ったオートメーション化に苦戦しながら鉱山防護服の完成までを体験する。",
+      locked: false,
+      questions: [
+        {
+          q: "今回提供として紹介された「アークナイツ：エンドフィールド」を送り出している会社は？",
+          choices: ["Cygames", "HoYoverse", "GRYPHLINE", "Sega"],
+          correct: 2,
+          explain: "正解はGRYPHLINE。「今回はグリフラインさんのアークナイツエンドフィールドを紹介していきたいと思います」と紹介されていた。"
+        },
+        {
+          q: "今回、中村さんが実際にプレイしたのはどのプラットフォーム版だった？",
+          choices: ["PlayStation5版", "iOS版", "Android版", "PC版"],
+          correct: 3,
+          explain: "正解はPC版。「今回プレイするのはPC版でございます」とはっきり説明されていた。"
+        },
+        {
+          q: "建築が苦手な初心者でも、素材さえ揃っていれば自動で組み立ててくれる本作の便利なシステムの名称は？",
+          choices: ["図面システム", "オートクラフト機能", "レシピブック", "設計図モード"],
+          correct: 0,
+          explain: "正解は図面システム。「図面システムってのがあって、初心者苦手な方でもその図面だけで勝手に組んでくれたりする」と紹介されていた。"
+        },
+        {
+          q: "送電タワー同士をつなぐ際、梶田さんに「絶対壊れます」と念を押されたNGな接続方法は？",
+          choices: ["最短距離で直結する", "直結せず送電タワーを経由する", "電力を最大まで供給する", "夜間のみ稼働させる"],
+          correct: 1,
+          explain: "正解は直結せず送電タワーを経由する（＝ケーブルの直結はNG）。中村さんが「直スなぎちゃダめなの?」と聞くと「直結はダめです」「絶対壊れます」と返されていた。"
+        },
+        {
+          q: "梶田さんがガチャで引いたと話していたキャラクターは、何色のレザーコートを着ていた？",
+          choices: ["青", "黒", "赤", "白"],
+          correct: 2,
+          explain: "正解は赤。「俺もガチャで引いたんですけど、その赤いレザーコート来たウルフガードさん」と紹介していた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "オートメーション完全制覇", line: "送電もベルトコンベアも完璧に繋いだ、管理人の鑑。" },
+        { min: 4, badge: "熟練エンジニア", line: "多少の配線ミスはあれど、工場はちゃんと稼働している。" },
+        { min: 3, badge: "見習い管理人", line: "図面システムに頼りつつも一通りの流れは達成。" },
+        { min: 1, badge: "直結事故多発", line: "「直結ダメです」を何度言われても直してしまう新人。" },
+        { min: 0, badge: "動力不足で操業停止", line: "残念、電力が届かず工場は止まったまま。" }
+      ]
+    },
+    {
+      id: "oberon-strawberry-shortcake-chan-kage-figures",
+      number: 54,
+      videoTitle: "【美フィギュア】オベロン&キュートないちごショート！ 美麗なフィギュアたちを愛でる！【開封動画】",
+      videoUrl: "https://www.youtube.com/watch?v=uyOjfT7QFhQ",
+      blurb: "アルターの新作フィギュア「オベロン・ヴォーティガーン」や、原型師・石長櫻子（植物少女園）による「いちごショートビスチェガール」、ジャッキー・チェン主演映画の刑事を模した可動フィギュアなど、毛色の違う三体を愛でる開封回。",
+      locked: false,
+      questions: [
+        {
+          q: "アルターの新作フィギュア「プリテンダー／オベロン・ヴォーティガーン」、キャラクターデザインを手掛けたイラストレーターは？",
+          choices: ["藤ちょこ", "武内崇", "森井しづき", "羽海野チカ"],
+          correct: 3,
+          explain: "正解は羽海野チカ。梶田さんが「海野さんがデザインしたサーバントで海野さんの絵柄が出てるんですね」と紹介しており、これはFGOオベロンの絵師・羽海野チカ氏を指している。"
+        },
+        {
+          q: "「いちごショートビスチェガール」は、何をテーマにした「6人の少女」のフィギュアのうちの1体だと紹介されていた？",
+          choices: ["ケーキ", "フルーツ", "花", "星座"],
+          correct: 0,
+          explain: "正解はケーキ。「ケーキをイメージしてる6人の少女のフィギュアのうちの」1体だと説明されていた。"
+        },
+        {
+          q: "梶田さんが持ち込んだジャッキー・チェン主演映画の刑事フィギュア、付属する「傘」は劇中のどんな名シーンを再現するための小道具？",
+          choices: ["雨除け", "バスにぶら下がり街を引きずられるシーンの再現", "変装用の小道具", "警棒代わりの武器"],
+          correct: 1,
+          explain: "正解はバスにぶら下がり街を引きずられるシーンの再現。「観光バスの後ろにこれを引っかけて街の中を」引きずられる名シーンの再現だと話していた。"
+        },
+        {
+          q: "オベロンのフィギュアで、頭上の王冠パーツを取り付ける際に梶田さんが「マジで痛え」と言っていた理由は？",
+          choices: ["王冠が重すぎて手が震えたから", "接着剤がはみ出していたから", "王冠の内側の突起が指に刺さったから", "王冠のサイズが合わなかったから"],
+          correct: 2,
+          explain: "正解は王冠の内側の突起が指に刺さったから。「これマジで痛えんだけどさ、被せようとする指に」「外側に広がってるのが」刺さると話していた。"
+        },
+        {
+          q: "FGOでオベロンの相棒のような存在として登場する、虫をモチーフにしたキャラクターの名前は？",
+          choices: ["ゲルググ", "ヴォーティガーン", "キマイラ", "ブランカ"],
+          correct: 3,
+          explain: "正解はブランカ。「これブランカっていう、本編中に本当に登場するオベロンの相棒みたいな虫」だと紹介されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "美術品級コレクター", line: "カメラに映らない奥の奥まで語れる、もはや鑑定士級。" },
+        { min: 4, badge: "原型師公認レベル", line: "細部のこだわりにもしっかり気づける観察眼の持ち主。" },
+        { min: 3, badge: "ディスプレイ棚確保勢", line: "飾る場所はちゃんと用意できている堅実派。" },
+        { min: 1, badge: "梱包紙のまま放置勢", line: "買った満足感で満たされ、開封は後回しになりがち。" },
+        { min: 0, badge: "戦利品迷子", line: "残念、どこに何をしまったかも分からなくなってしまった。" }
+      ]
+    },
+    {
+      id: "shanghai-disney-zootopia-omiyage",
+      number: 55,
+      videoTitle: "【ディズニー】ダッフィー&ズートピア！ちょっぴりレアなカワイイグッズ買ってきた【お土産】",
+      videoUrl: "https://www.youtube.com/watch?v=K7LQjPVmcHc",
+      blurb: "梶田さんが上海出張時に訪れた上海ディズニーランドで買い込んだダッフィー&フレンズグッズや、世界唯一のズートピアエリア限定ブラインドボックスを次々開封しつつ、番外編で観劇した舞台『千と千尋の神隠し』上海公演のレポートも披露する私物紹介回。",
+      locked: false,
+      questions: [
+        {
+          q: "梶田さんは限定のダッフィー&フレンズ リュックを購入する権利を、どうやって手に入れた？",
+          choices: ["開園前に並んで整理券をもらった", "ディズニーホテルのスイートルームに宿泊した", "SNSキャンペーンに応募して当選した", "現地スタッフに直接頼み込んだ"],
+          correct: 1,
+          explain: "正解はホテルのスイートルームに宿泊したこと。梶田さんは「そのディズニーのスイートに泊まったからか、その買うための権利みたいなの得られたんですよ」と話していた。"
+        },
+        {
+          q: "動画内で「エリアが存在するのは世界で上海のみ」と紹介されたディズニー作品は？",
+          choices: ["アナと雪の女王", "モンスターズ・インク", "ズートピア", "リトル・マーメイド"],
+          correct: 2,
+          explain: "正解はズートピア。梶田さんは「ズートピアのエリアが存在するのは上海のみなんですよね」と、世界で上海ディズニーランドにしかない専用エリアであることを説明していた。"
+        },
+        {
+          q: "ブラインドボックスに入っていた「運輸局（DMV）職員」のキャラクターについて、梶田さんが強調していた特徴は？",
+          choices: ["手続きの動きが極端にスロー", "常に踊っている", "書類を何枚も落とす", "とにかく声が大きい"],
+          correct: 0,
+          explain: "正解は動きが極端にスローな点。梶田さんは「手続きする際にもう動きがこのぐらいスローです」とナマケモノ職員のもっさりした動きを再現して見せていた。"
+        },
+        {
+          q: "上海ディズニーのブラインドボックス（ズートピアシリーズ）には、購入時に何点までという個数制限があった？",
+          choices: ["1点まで", "5点まで", "制限はなかった", "2点まで"],
+          correct: 3,
+          explain: "正解は2点まで。転売対策もあって「これ2点までって接勝じゃないですか?」「人気だから多分数に限りがあって」と購入数に上限が設けられていることが話題になっていた。"
+        },
+        {
+          q: "番外編で紹介された、上海公演版『千と千尋の神隠し』舞台のオリジナルポスター（ノート）について語られていたことは？",
+          choices: ["会場で無料配布されていた", "日本でも同じものが売っていた", "在庫が残り3冊しかなく全部買った", "オンライン限定販売品だった"],
+          correct: 2,
+          explain: "正解は残り3冊しかなく3冊とも買ったこと。梶田さんは「冊しかなかったから3冊とも買って」と、中国限定の舞台グッズを売り切れ寸前で購入していた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "上海ディズニーVIP会員", line: "スイート宿泊者だけが得られる購入権利級の強運。" },
+        { min: 4, badge: "ズートピア観光大使", line: "世界唯一のエリアを完全満喫できるレベル。" },
+        { min: 3, badge: "限定グッズハンター", line: "ブラインドボックスも危なげなく攻略できる腕前。" },
+        { min: 1, badge: "お土産ビギナー", line: "とりあえずダッフィーは押さえておいた感じ。" },
+        { min: 0, badge: "免税店で迷子", line: "気づいたらチョコレート棒だけ買っていたタイプ。" }
+      ]
+    },
+    {
+      id: "sakuna-hinuka-junreitan-pr",
+      number: 56,
+      videoTitle: "【天穂のサクナヒメ～ヒヌカ巡霊譚～】謎の群島で米作り！本格稲作RPGをプレイ！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=SrzICDNKdU8",
+      blurb: "発売直後から自宅配信で遊び込んできた『天穂のサクナヒメ』最新作『ヒヌカ巡霊譚』を、開発中のビルドでいち早くプレイ。塩水と泥水を使い分ける選別など本格的すぎる米作りシステムと、新主人公ヒヌカヒメたちが挑む探索バトルを紹介するPR回。",
+      locked: false,
+      questions: [
+        {
+          q: "梶田さんと中村さんは前作『天穂のサクナヒメ』を、発売からどれくらいのタイミングで自宅配信していた？",
+          choices: ["発売から10日後", "発売前の先行版", "発売から半年後", "発売から1年後"],
+          correct: 0,
+          explain: "正解は発売から10日後。梶田さんは「発売から10日後にわでやっただけ」と、世間で話題になる前から早期にプレイしていたことを強調していた。"
+        },
+        {
+          q: "本作『ヒヌカ巡霊譚』で新たに登場する主人公の名前は？",
+          choices: ["サクナヒメ", "ヒヌカヒメ", "ココロワヒメ", "ヒノヒメ"],
+          correct: 1,
+          explain: "正解はヒヌカヒメ。字幕では「日姫」と誤変換されていたが、公式サイトの登場人物紹介によれば記憶を失った少女ヒヌカヒメが本作の新主人公として登場する。"
+        },
+        {
+          q: "ヒヌカの相棒的存在として新たに登場するキャラクターは？",
+          choices: ["ヨミ", "イムスビヒメ", "コヨミ", "カグラ"],
+          correct: 2,
+          explain: "正解はコヨミ。字幕では「読み」と表記されていたが、公式サイトではヒヌカの相棒的存在としてコヨミが紹介されている。"
+        },
+        {
+          q: "種もみの選別方法について、動画内で中村さんが「初めて知った」と驚いていたのは何を使う方法？",
+          choices: ["炭酸水を使う方法", "塩水を使う方法", "お湯だけを使う方法", "泥水を使う方法"],
+          correct: 1,
+          explain: "正解は塩水を使う方法。ゲーム内の説明を読んだ中村さんが「塩水使うんだ。初めて知ったわ」と、泥水と塩水どちらでも選別できる設定に驚いていた。"
+        },
+        {
+          q: "リリース記念ログインボーナスでは、期間中7日間ログインすると何がもらえると紹介された？",
+          choices: ["ガチャ石", "稲魂の欠片", "お米チケット", "約束のかけら"],
+          correct: 3,
+          explain: "正解は約束のかけら。「期間中合計7日間ログインすると約束のかけらがもらえる」とお知らせコーナーで紹介されていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "新米マイスター", line: "塩水選別も水温管理も完璧、理論値超えの一等米級。" },
+        { min: 4, badge: "一等米", line: "見応えある知識量、稲作ガチ勢の仲間入り。" },
+        { min: 3, badge: "二等米", line: "だいたい把握できている実りある結果。" },
+        { min: 1, badge: "くず米", line: "お任せ編成に頼りたくなる出来。" },
+        { min: 0, badge: "苗代からやり直し", line: "もう一度実況を見返して勉強しよう。" }
+      ]
+    },
+    {
+      id: "animage-2002-04-miyazaki-interview",
+      number: 57,
+      videoTitle: "【アニメージュ】千と千尋に沸く世間に喝！ 激レアな宮崎監督インタビュー回、読んでみた【2002年4月号】",
+      videoUrl: "https://www.youtube.com/watch?v=k45us9BFcH0",
+      blurb: "2002年、ベルリン国際映画祭で『千と千尋の神隠し』がグランプリを受賞した直後に発売されたアニメージュを即決購入し、宮崎駿監督の記者会見全発言や当時のアニメ広告をひたすら読み込んでいく雑誌回。",
+      locked: false,
+      questions: [
+        {
+          q: "梶田さんが今回取り上げたアニメージュ2002年4月号の目玉企画は？",
+          choices: ["次回作の設定資料公開", "ベルリン国際映画祭グランプリ受賞時の宮崎駿監督の記者会見全発言", "声優インタビュー特集", "読者プレゼント企画"],
+          correct: 1,
+          explain: "正解はベルリン国際映画祭でのグランプリ受賞会見全発言。「12ページからされた全発言記録を読んでこ」と、受賞会見の内容がまるごと文字起こしされていた特集号だった。"
+        },
+        {
+          q: "ぬいぐるみとの記念撮影でファンにダブルピースを求められた宮崎監督は、何と言って断ったと紹介されていた？",
+          choices: ["そんな下品なことできませんよ", "時間がないので", "笑顔が苦手なので", "カメラが嫌いなので"],
+          correct: 0,
+          explain: "正解は「そんな下品なことできませんよ」。誌面には「サインを求める人にそんな下品なことできませんよとピシャ」と、ダブルピースをきっぱり断った様子が書かれていた。"
+        },
+        {
+          q: "海外記者に「日本には神様が何人いるのか」と聞かれた宮崎監督は何と答えたと紹介されていた？",
+          choices: ["数えたことがない", "一人だけ", "八百万人いる", "千人くらい"],
+          correct: 2,
+          explain: "正解は八百万人。「実は日本では神様っていうのはやおよろずの神って言ってね……八百万人いるんですよ」と答えて記者たちに喜ばれたという発言が誌面に載っていた。"
+        },
+        {
+          q: "鈴木敏夫プロデューサーが補足していた「ジャパニメーション」という言葉、海外では本来どんな作品の代名詞だったと紹介されていた？",
+          choices: ["高品質なアニメ全般を指す褒め言葉", "日本製ロボットアニメの総称", "手塚治虫作品を指す言葉", "暴力的でHな表現を含む作品の代名詞"],
+          correct: 3,
+          explain: "正解は暴力的でHな表現を含む作品の代名詞。鈴木さんは「ジャパニメーションというものの本当の意味は、実はHと暴力の代名詞なんですよ」と補足していた。"
+        },
+        {
+          q: "梶田さんが以前宮崎監督に会った際「僕、ゲド戦記見てたんですよ」と話したところ、監督は何と返したと梶田さんは振り返っていた？",
+          choices: ["ありがとう", "見なくていい", "俺のじゃねえ", "息子によろしく"],
+          correct: 2,
+          explain: "正解は「俺のじゃねえ」。息子・宮崎吾朗監督の作品と勘違いされていたことへの一言で、梶田さんは「僕ゲド戦記見てたんですよって。俺のじゃねえって言われて」と振り返っていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "編集長", line: "全発言記録も広告ページも読み逃さない完璧な取材力。" },
+        { min: 4, badge: "敏腕記者", line: "行間まで読み込む鋭い着眼点の持ち主。" },
+        { min: 3, badge: "見習い記者", line: "誌面の見どころはしっかり押さえている。" },
+        { min: 1, badge: "読者投稿止まり", line: "面白い記事だけ拾い読みしたレベル。" },
+        { min: 0, badge: "立ち読みで満足", line: "表紙だけ見て棚に戻してしまったかも。" }
+      ]
+    },
+    {
+      id: "tekuronosu-cross-heroine-pr",
+      number: 58,
+      videoTitle: "【テクロノス】ゲームプレイ画面初公開！ “神プロ×あやらぶ×れじぇくろ” ヒロインオールスターなRPGをプレイ！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=83JmqcFGpS0",
+      blurb: "『神姫PROJECT』『あやかしランブル！』『れじぇくろ！』のキャラクターが集うEXNOA×テクロス新作『テクロノス』のゲーム画面をわしゃがなTVが本邦初公開。バトル・アシスト両方のヒロインを見比べつつ、梶田の気になるキャラを当てるクイズ企画にも挑戦する。",
+      locked: false,
+      questions: [
+        {
+          q: "『テクロノス』は『神姫PROJECT』『あやかしランブル！』と、もう1つどのタイトルとのクロスオーバー作品として紹介された？",
+          choices: ["グランブルーファンタジー", "れじぇくろ！", "プリンセスコネクト", "崩壊スターレイル"],
+          correct: 1,
+          explain: "正解はれじぇくろ！。梶田さんは「神姫プロジェクトやあやかしランブル、れじぇくろのタイトルの人気キャラが登場するオールスターRPG」と3タイトルのクロスオーバーであることを紹介していた。"
+        },
+        {
+          q: "ゲームの舞台として紹介された、複数の世界がつながるワンダーランドの名前は？",
+          choices: ["クロスワールディア", "ドリームクロニクル", "クロスパラダイム", "クロスドリィミア"],
+          correct: 3,
+          explain: "正解はクロスドリィミア。あらすじ紹介で「世界と世界が繋がるワンダーランド、クロスドリィミア」と説明されていた、キャラクターたちが集うお祭り騒ぎの街。"
+        },
+        {
+          q: "『テクロノス』はEXNOAとテクロスにとって何年ぶりの新作タイトルとして紹介された？",
+          choices: ["4年ぶり", "2年ぶり", "6年ぶり", "10年ぶり"],
+          correct: 0,
+          explain: "正解は4年ぶり。梶田さんは以前「れじぇクロ」の生放送MCを担当していたことに触れつつ、『テクロノス』がEXNOA×テクロスにとって4年ぶりの新作タイトルであることを紹介していた。"
+        },
+        {
+          q: "梶田さんの『気になるキャラクターランキングクイズ』で、中村さんが見事的中させた2キャラは「ライアー」ともう1体、どのキャラだった？",
+          choices: ["ソル", "ミカエル", "アンドロメダ", "キュベレ"],
+          correct: 2,
+          explain: "正解はアンドロメダ。「ライアーだけ当たってますね」に続き、アシストキャラのアンドロメダも梶田さんの本命に含まれていたことが判明し、みごと2キャラ的中となった。"
+        },
+        {
+          q: "クイズで中村さんが正解したことにより、リスナーにプレゼントされることになったのは？",
+          choices: ["描き下ろしイラスト集", "サイン入りグッズ", "ゲーミングPC", "リリース後に使えるゲーム内アイテムのシリアルコード"],
+          correct: 3,
+          explain: "正解はゲーム内アイテムのシリアルコード。「テクロノスのリリース後に使うとゲーム内アイテムがもらえるシリアルコードをプレゼントしちゃいますよ」というクイズ企画の賞品だった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "シークレット排出", line: "本邦初公開の情報を一言一句逃さなかった当たり枠。" },
+        { min: 4, badge: "SSR確定枠", line: "キャラもストーリーもしっかり記憶している上振れ。" },
+        { min: 3, badge: "SR当選", line: "見どころはきちんと押さえられている手堅い結果。" },
+        { min: 1, badge: "R止まり", line: "なんとなく雰囲気だけつかんだ感じ。" },
+        { min: 0, badge: "ガチャ失敗", line: "事前登録だけして満足してしまったタイプ。" }
+      ]
+    },
+    {
+      id: "miyazaki-miyage-taberikurabe",
+      number: 59,
+      videoTitle: "【お菓子】南国育ちのウマいやつ！ 宮崎みやげ食べ比べ！【お土産】",
+      videoUrl: "https://www.youtube.com/watch?v=HyimA2M_5Tw",
+      blurb: "大川ぶくぶが送ってくれた宮崎県のお土産お菓子を、中村悠一とマフィア梶田が次々と食べ比べていく回。ポケモンとコラボした芋けんぴやチーズ入りの餅、へべす風味のジャーキーなど、南国育ちの珍味が続々登場する。",
+      locked: false,
+      questions: [
+        {
+          q: "今回の宮崎みやげ詰め合わせを、番組の構成作家として送ってくれたのは誰？",
+          choices: ["大川ぶくぶ", "マフィア梶田", "中村悠一", "番組スタッフ"],
+          correct: 0,
+          explain: "正解は大川ぶくぶ（ブクちゃん）。「我らが大川ぶくぶが送ってくれました」「わざわざ宮崎のお菓子の詰め合わせを送ってくれたみたいです」と紹介されていた。"
+        },
+        {
+          q: "宮崎みやげの中で、ヤシの木のようなポケモン「ナッシー」とコラボしていたお菓子の主な原材料は？",
+          choices: ["チーズ", "マンゴー", "さつまいも", "米"],
+          correct: 2,
+          explain: "正解はさつまいも。パッケージを見て「ナシーかな、これ」「宮崎、ポケモンコラボがあるんだ」と話しており、南国イメージのヤシの木ポケモン、ナッシーとコラボした芋菓子だった。"
+        },
+        {
+          q: "「チーマン」は、求肥（もち）で何を包み込んだ「新感覚スイーツ」だったか？",
+          choices: ["あんこ", "チーズ", "キャラメル", "マンゴー"],
+          correct: 1,
+          explain: "正解はチーズ。「求肥でチーズを包み込んだ新感覚スイーツ」と箱に書かれており、実際に食べて「噛んだらチーズだな」「脳がバグる」とかなり強いチーズ感に驚いていた。"
+        },
+        {
+          q: "たけのこジャーキーに振りかけて食べていた、宮崎県日向市特産の香酸柑橘は？",
+          choices: ["ゆず胡椒", "かぼす", "すだち", "へべす"],
+          correct: 3,
+          explain: "正解はへべす。一味唐辛子と合わせて使い、「天然のヘベスの香りが美味しい。アロマ調味料です」「換橘のその酸味があるわ」と絶賛していた。"
+        },
+        {
+          q: "同封されていた「生キャラメル」やジュースに使われていた果物の組み合わせは？",
+          choices: ["マンゴーとヒュウガナツ", "パイナップルとみかん", "いちごとメロン", "ぶどうとオレンジ"],
+          correct: 0,
+          explain: "正解はマンゴーとヒュウガナツ。「マンゴとヒガナツの生キャラメル」「マンゴとヒガナツのガブドリンクですよ」と紹介され、南国フルーツの組み合わせを楽しんでいた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "宮崎観光大使", line: "みやげの魅力を全部平らげた、南国愛あふれる猛者。" },
+        { min: 4, badge: "地鶏マイスター", line: "宮崎名物の知識をほぼ制覇した実力派。" },
+        { min: 3, badge: "ヒュウガナツ通", line: "程よく宮崎グルメを味わい尽くした一人前。" },
+        { min: 1, badge: "みやげ番見習い", line: "まだまだ宮崎の奥深さを知る旅の途中。" },
+        { min: 0, badge: "正体不明の木札", line: "笑顔のトラップにやられてしまった残念な結果。" }
+      ]
+    },
+    {
+      id: "vandread-frieren-goods",
+      number: 60,
+      videoTitle: "【ヴァンドレッド】フリーレンは大人の香り！？ コラボグッズでキャラを身近に感じるわしら【私物紹介】",
+      videoUrl: "https://www.youtube.com/watch?v=xfolH-zjCvY",
+      blurb: "発売されたばかりのモデロイド『ヴァンドレッド』のプラモデルや、フリーレンとサイバーパンク エッジランナーズのキャラクター香水、クワトロ・バジーナや山寺宏一プロデュースのサングラスなど、私物グッズを次々紹介していく回。",
+      locked: false,
+      questions: [
+        {
+          q: "モデロイド「ヴァンドレッド ディータ」のパッケージに同封されていた懐かしいアイテムは？",
+          choices: ["設定資料が入ったCD-ROM", "特典フィギュア", "ポスター", "缶バッジ"],
+          correct: 0,
+          explain: "正解はCD-ROM。「付録のCDロームがついてます」「読み込めんのよ」と、当時懐かしいデジタル設定資料が入ったディスクが同梱されていた。"
+        },
+        {
+          q: "ヴァンドレッドのメカニックデザインを手がけたのは誰？",
+          choices: ["大河原邦男", "海老川兼武", "出渕裕", "河森正治"],
+          correct: 1,
+          explain: "正解は海老川兼武。「これ海老川さんがデザインされてるんですよ、バンドレットは」と話しており、令和のプラモデル化にあたり新規ディテールも加えられている。"
+        },
+        {
+          q: "香水コラボで登場した、フリーレンと並ぶもう一つのキャラクターは『サイバーパンク エッジランナーズ』の誰の香り？",
+          choices: ["ルーシー", "キウィ", "レベッカ", "パンサー"],
+          correct: 2,
+          explain: "正解はレベッカ。「こっちはサイバーパンクエッジランナーズのレベッカの香りなんすよ」と紹介され、刺激的なトップノートから徐々に甘い香りへ変化する設定だった。"
+        },
+        {
+          q: "クワトロ・バジーナモデルのサングラスは、STRICT-Gとどのアイウェアブランドのコラボ商品だったか？",
+          choices: ["Zoff", "JINS", "Oakley", "スワンズ（SWANS）"],
+          correct: 3,
+          explain: "正解はスワンズ。ケースの刻印を見て「あ、これストリクトなんだ」「スワンズって書いてある」と判明した、ガンダムコラボブランドの商品だった。"
+        },
+        {
+          q: "山寺宏一プロデュースの「Koichi Yamadera EYEWEAR」で、テンプル（つる）先端の金属パーツがモチーフにしているのは？",
+          choices: ["「山」の字", "フクロウ", "星マーク", "波模様"],
+          correct: 0,
+          explain: "正解は「山」の字。「山の字を意識しつつフロントとの重量バランスを取る役目も果たしてる」と説明があり、山寺さんの名前にちなんだデザインだった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "私物マイスター", line: "コラボグッズの元ネタを完璧に言い当てる猛者。" },
+        { min: 4, badge: "キャラ香水ソムリエ", line: "香りだけでキャラクターを言い当てる実力派。" },
+        { min: 3, badge: "コレクター一年生", line: "グッズの魅力を十分に楽しめた一人前。" },
+        { min: 1, badge: "モデロイド見習い", line: "まだまだ知識を仕入れている最中の新人。" },
+        { min: 0, badge: "地上波難民", line: "ノンスクランブル枠を見逃してしまった残念な結果。" }
+      ]
+    },
+    {
+      id: "daiouja-terada-toybox",
+      number: 61,
+      videoTitle: "【超変形ミッキーマウス】この紋所が目に入らぬか！ 寺田貴信さんからいただいた初見なロボット詰め合わせ開封！【ダイオージャ】",
+      videoUrl: "https://www.youtube.com/watch?v=dLvaxB40XDg",
+      blurb: "スーパーロボット大戦プロデューサー寺田貴信さんから届いた大量の私物おもちゃを開封する回。『最強ロボ ダイオージャ』の大王者やソロモン攻略戦カラーのガンプラ、超変形するミッキーマウスのロボット玩具まで飛び出す。",
+      locked: false,
+      questions: [
+        {
+          q: "今回「おもちゃ送りおじさん」として大量の箱を送ってくれた寺田貴信さんの本来の肩書は？",
+          choices: ["声優", "スーパーロボット大戦シリーズのプロデューサー", "アニメ監督", "漫画家"],
+          correct: 1,
+          explain: "正解はスーパーロボット大戦シリーズのプロデューサー。「ゲームプロデューサー寺田さんから」「またおもちゃ送りおじさんとして」と紹介されている、スパロボの生みの親とも言える人物。"
+        },
+        {
+          q: "『最強ロボ ダイオージャ』で、3体のロボが合体してできる主役ロボットの名前は？",
+          choices: ["ゲッターロボ", "コンバトラーV", "大王者（ダイオージャ）", "ボルテスV"],
+          correct: 2,
+          explain: "正解は大王者。「エースレッダー」「蒼いだー」「コバルター」の3体が合体すると人型の大王者になる、と箱の中身を見ながら解説していた。"
+        },
+        {
+          q: "大王者のパイロット名「デューク・スケード」「バロン・カークス」は、水戸黄門の誰と誰のパロディか？",
+          choices: ["助さんと格さん", "水戸光圀と徳川家康", "風魔小太郎と猿飛佐助", "織田信長と豊臣秀吉"],
+          correct: 0,
+          explain: "正解は助さんと格さん。「江戸の国」「水戸黄門」を思わせる設定で、時代劇の定番コンビをモチーフにしたキャラクター名だと盛り上がっていた。"
+        },
+        {
+          q: "寺田さんから届いた「ソロモン攻略戦カラー」のガンプラについて、通常版とどんな違いがあると話していたか？",
+          choices: ["サイズが大きい", "値段が高い", "可動域が広い", "色味が深く渋い（ミリタリー感が強い）"],
+          correct: 3,
+          explain: "正解は色味の違い。「渋みを増した」「よりミリタリーっぽくなってんだよな」と、通常カラーより深みのある渋い塗装になっていた。"
+        },
+        {
+          q: "超変形するミッキーマウスのロボット玩具、完成した巨大なウィングパーツは何体分を組み合わせたものだったか？",
+          choices: ["1体分", "2体分", "3体分", "5体分"],
+          correct: 2,
+          explain: "正解は3体分。「3人分をね、合体させるみたいよ」「3体の背中のウィングを1つにすると巨大ウィングが完成する」と説明書を読みながら驚いていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "寺田貴信スーパーバイザー", line: "送られてきたおもちゃの知識を完全網羅した猛者。" },
+        { min: 4, badge: "スパロボ古参プレイヤー", line: "レア機体の元ネタまでしっかり押さえている実力派。" },
+        { min: 3, badge: "大王者ファン一年生", line: "合体ロボの魅力にすっかりハマった一人前。" },
+        { min: 1, badge: "ソロモン攻略戦見習い", line: "まだまだ知識を仕入れている最中の新兵。" },
+        { min: 0, badge: "膝が弱いロボット", line: "変形の途中で崩れ落ちてしまった残念な結果。" }
+      ]
+    },
+    {
+      id: "koihime-taisen-allstar-pr",
+      number: 62,
+      videoTitle: "【恋姫大戦】は、はわわ、ご主人様、恋姫オールスターが来ちゃいました！ 英雄美少女大集合ゲームをプレイ！【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=Nmre7N6cO5k",
+      blurb: "エクスノアの新作ゲーム『恋姫†大戦』のPR動画。歴代恋姫シリーズのキャラクターを見た目だけで当てるミリシラクイズを楽しみながら、実際にRTSバトルパートをプレイしていく。",
+      locked: false,
+      questions: [
+        {
+          q: "今回紹介された新作ゲーム『恋姫大戦』を制作・提供しているのは？",
+          choices: ["スクウェア・エニックス", "Cygames", "エクスノア（EXNOA）", "コーエーテクモ"],
+          correct: 2,
+          explain: "正解はエクスノア。「エクスノアさんの恋姫大戦を紹介していきたいと思います」と紹介され、概要欄にも©2025 EXNOA LLC/NEXTONと記載されている。"
+        },
+        {
+          q: "事前登録特典として紹介されていたのは、SSR確定チケットや転送石（最大1万個）ともう一つは何？",
+          choices: ["限定スキン", "恋姫ガチャチケット", "課金アイテム詰め合わせ", "声優サイン色紙"],
+          correct: 1,
+          explain: "正解は恋姫ガチャチケット。「SSR確定チケット、転送石最大1万個、恋姫ガチャチケット」が事前登録特典として紹介されていた。"
+        },
+        {
+          q: "ゲーム内の「姫集め」というミニゲームは、どんなゲームになぞらえて説明されていたか？",
+          choices: ["麻雀", "双六", "将棋", "ポーカー"],
+          correct: 3,
+          explain: "正解はポーカー。「ガチャで引いたキャラクターを使って役を完成させるポーカーのようなゲームになっている」と紹介されていた。"
+        },
+        {
+          q: "キャラクター当てクイズで信長だと判明した決め手は、南蛮風の鎧のほかにどんな史実だったか？",
+          choices: ["鉄砲を大量に保有していた", "ポルトガルから来た南蛮ファッションに敏感だった", "茶道を好んでいた", "相撲が得意だった"],
+          correct: 1,
+          explain: "正解はファッションの流行に敏感だったこと。「南蛮の鎧を身につけるくらいファッションの流行に」「ポルトガルから来てた」という史実を根拠に信長だと言い当てていた。"
+        },
+        {
+          q: "バトルパートはどんなゲームジャンルとして紹介されていたか？",
+          choices: ["RTS（リアルタイムストラテジー）", "ターン制コマンドバトル", "パズルゲーム", "音楽ゲーム"],
+          correct: 0,
+          explain: "正解はRTS。「RTSをね、そのリアルタイムストラテジーをやるのは結構久々なんだけど」と感想を話しており、戦略性のあるバトルシステムだった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "全武将踏破の軍師", line: "見た目だけで武将を言い当てる歴女力の持ち主。" },
+        { min: 4, badge: "戦国三国マイスター", line: "かなりの武将知識でクイズを制した実力派。" },
+        { min: 3, badge: "はわわ従者", line: "そこそこの知識でご主人様についていける一人前。" },
+        { min: 1, badge: "ミリシラ新兵", line: "まだまだ武将の見分けがつかない見習い。" },
+        { min: 0, badge: "呂布に瞬殺された雑兵", line: "残念、次の戦いに期待しよう。" }
+      ]
+    },
+    {
+      id: "mtg-spiderman-collector-booster",
+      number: 63,
+      videoTitle: "【マジック：ザ・ギャザリング】スパイダーマン ブースター開封！わしらセンスでレアカードゲット！？【開封動画】",
+      videoUrl: "https://www.youtube.com/watch?v=yRvqDjk0ZaI",
+      blurb: "マジック:ザ・ギャザリングのスパイダーマン・コレクターブースターを2人で開封し、素人にはわかりにくいレアリティの見分け方に四苦八苦しながら大当たりカードを探す回。",
+      locked: false,
+      questions: [
+        {
+          q: "カードのレアリティは、名前欄右にあるスパイダーマークの色で見分けられると説明された。「茶色」が示すレアリティは？",
+          choices: ["アンコモン(銀)", "レア(金)", "ミシック(神話レア)", "コモン(白)"],
+          correct: 2,
+          explain: "正解はミシック(神話レア)。「金と茶色の見分けむずく」「一応その…左下にRかMってちっちゃく書いてある」と、茶色＝ミシックの見分け方が語られた。"
+        },
+        {
+          q: "開封したカードの中で最終的に「一番高額」と判定された「ソウルストーン」の推定価格は？",
+          choices: ["1万5,000円", "3,000円", "8,000円", "3万円"],
+          correct: 0,
+          explain: "正解は1万5,000円。最初は「8000円」「1万円みたいな」と言われていたが、最後に「そうすると1万5000円」「これがトップか」「出た中ではそれがトップでしょうね」と結論づけられた。"
+        },
+        {
+          q: "「家賃を払え」という趣旨のテキストが書かれたカードが出てきて2人が盛り上がったが、これは誰の家賃事情についての話題だったか？",
+          choices: ["中村一(声優)", "黒スパイダーマン", "メイおばさん", "ピーター・パーカー"],
+          correct: 3,
+          explain: "正解はピーター・パーカー。「取り立てだよ、これ」「ピーターパーカー家賃に対応してたの」とパーカーの家賃事情について盛り上がった。"
+        },
+        {
+          q: "冒頭で「これは名シーンですよ」と二人が盛り上がったカードは、スパイダーマン映画のどんな名場面を描いたものだった？",
+          choices: ["ヴィランとの決戦シーン", "スパイダーマンとMJの逆さ吊りキスシーン", "ニューヨーク上空を飛ぶシーン", "初めて仮面を被るシーン"],
+          correct: 1,
+          explain: "正解は逆さ吊りキスシーン。「がっつり(めく)られてるわ」「口だけだった」「お前だったか」というやり取りは、マスクを口元までめくって行う映画の名場面(MJとのキス)を指している。"
+        },
+        {
+          q: "「前にもコラボ商品を開封した」と話していた、マジック:ザ・ギャザリングの他社コラボ作品は？",
+          choices: ["ストレンジャー・シングス", "名探偵コナン", "ファイナルファンタジー(FF)", "ドクター・フー"],
+          correct: 2,
+          explain: "正解はファイナルファンタジー(FF)。「マジックはこないだのあのFFを開けたじゃない?」「あれの時も思ったけどさ、本当に素人にはレアリティがよくわからないんだよね」と振り返っている。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "ミシックレア", line: "茶色に輝く別格の当たり運。パック買い増し不可避。" },
+        { min: 4, badge: "ゴールドレア", line: "金色の輝きを引き寄せる強運の持ち主。" },
+        { min: 3, badge: "シルバーアンコモン", line: "渋くも堅実な当たり。十分満足の結果。" },
+        { min: 1, badge: "ホワイトコモン", line: "手堅いけど地味め。次のパックに期待しよう。" },
+        { min: 0, badge: "対抗呪文", line: "残念、キャンセルされてしまった。また挑戦しよう。" }
+      ]
+    },
+    {
+      id: "gquuuuuux-akai-gundam-ex-signed-poster",
+      number: 64,
+      videoTitle: "【ジークアクス】大物クリエイターの激レア〇〇〇！令和ガンダム ダブルで開封！【ガンダムEX】",
+      videoUrl: "https://www.youtube.com/watch?v=crjJ7skNKRs",
+      blurb: "プライズで手に入れた全高約28cmの『赤いガンダム』(ジークアクス)と、インタビュー担当のお礼にもらった大物クリエイターたちの直筆サイン入りポスター、さらに『機動戦士ガンダム 復讐のレクイエム』のガンダムEXフィギュアを開封しながら盛り上がる回。",
+      locked: false,
+      questions: [
+        {
+          q: "プライズフィギュア「限界突破」シリーズの『赤いガンダム』(ジークアクス)、その全高はおよそ何cm？",
+          choices: ["約28cm", "約15cm", "約40cm", "約50cm"],
+          correct: 0,
+          explain: "正解は約28cm。「このサイズのやつやっぱ達成感ありますよね」「圧倒的な存在感」「サイズ見ての通りだいぶでかめ」と大きさが強調された、限界突破シリーズの超ビッグサイズフィギュア。"
+        },
+        {
+          q: "動画タイトルで伏字(〇〇〇)になっていた「激レア〇〇〇」の正体は？",
+          choices: ["設定資料", "立体原型", "初期プロップ", "直筆サイン(入りポスター)"],
+          correct: 3,
+          explain: "正解は直筆サイン。「あらゆる人の名前が」「山下さんも入ってるし…いろんな方がね、これ全部書いてくださって」と、大物クリエイターたちの直筆サイン入りポスターが公開された。"
+        },
+        {
+          q: "そのサイン入りポスターを手に入れたきっかけは？",
+          choices: ["オークションで落札した", "インタビュー動画を担当したお礼として関係者が用意してくれた", "メンバーシップ抽選に当選した", "梶田が独自のコネで入手した"],
+          correct: 1,
+          explain: "正解はお礼としてもらったこと。「俺ジクアクスのインタビュー動画を担当したんですよ…担当者君が気を利かせてくれて、俺のためにこれ頼んでくれたんですよ」と語られた。"
+        },
+        {
+          q: "中村さんがもう一つ開封した「ガンダムEX」が登場する作品タイトルは？",
+          choices: ["機動戦士ガンダムSEED DESTINY", "機動戦士ガンダムNT", "機動戦士ガンダム 復讐のレクイエム", "機動戦士ガンダム 閃光のハサウェイ"],
+          correct: 2,
+          explain: "正解は『機動戦士ガンダム 復讐のレクイエム』。「これガンダムEXって読ん?」というやり取りの通り、Netflixオリジナルの同作に登場する機体。"
+        },
+        {
+          q: "『赤いガンダム』のフィギュア、梶田が「膝動くよ」と驚いたが、実際はどうだった？",
+          choices: ["実際に膝関節が稼働した", "電池を入れると動いた", "背中のレバーで動いた", "見た目だけで実際には動かない固定ポーズだった"],
+          correct: 3,
+          explain: "正解は動かない固定ポーズ。「これ関節動く?いや、動かねえよ」「これは動きそうに見えてるだけ」「無稼働っすよ、これ」と説明された。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "限界突破", line: "プライズの限界を超えた大当たり。存在感が違う。" },
+        { min: 4, badge: "歴史を変えた機体", line: "One Year Warの流れを変える強運の一撃。" },
+        { min: 3, badge: "量産機クラス", line: "手堅い当たり。安定した戦力。" },
+        { min: 1, badge: "無稼働ソフビ", line: "地味だけど味のある結果。" },
+        { min: 0, badge: "開発資料は破棄", line: "残念、記録は失われた。また挑戦しよう。" }
+      ]
+    },
+    {
+      id: "newtype-2007-january-back-issue",
+      number: 65,
+      videoTitle: "【月刊ニュータイプ】20年目の答え合わせ!? あの時はエヴァもガンダムSEEDも全然違った!【2007年1月号】",
+      videoUrl: "https://www.youtube.com/watch?v=QHqiyDycLoE",
+      blurb: "未開封のまま保管されていた2007年1月号の月刊ニュータイプをその場で開封し、豪華すぎる付録や当時のアニメ特集・広告ページを読みながら懐かしい記憶を掘り起こしていく回。",
+      locked: false,
+      questions: [
+        {
+          q: "未開封の雑誌を開けると付録が付いていた。ビニールカバー付きだったそのアイテムは何だった？",
+          choices: ["缶バッジとステッカー", "卓上カレンダーと下敷き", "アドレス帳とメモ帳", "ポストカードとしおり"],
+          correct: 2,
+          explain: "正解はアドレス帳とメモ帳。「ビニールカバー付きのアドレスとかカレンダー帳」「これアドレス帳で、これメモ帳で」と紹介され、「これ普通に売り物になるレベルじゃないの?」と驚かれた。"
+        },
+        {
+          q: "誌面の漫画紹介ページで話題になった『NHKにようこそ！』のNHKの本当の意味として梶田が説明したのは？",
+          choices: ["日本ひきこもり協会", "日本放送協会", "日本ホビー協会", "日本平和協会"],
+          correct: 0,
+          explain: "正解は日本ひきこもり協会。「これ何の役だと思ってます?」「日本引きこもり協会です」というやり取りの通り、作中でNHKは日本ひきこもり協会の略とされている。"
+        },
+        {
+          q: "誌面で紹介されていた幻のモビルスーツ「ハンマハンマ」、本来はどの作品用に永野護がデザインしたものだったか？",
+          choices: ["機動戦士Zガンダム", "機動戦士ガンダムF91", "ファイブスター物語", "機動戦士ガンダム 逆襲のシャア"],
+          correct: 3,
+          explain: "正解は『機動戦士ガンダム 逆襲のシャア』。誌面の解説文には「シャアが登場する最後のモビルスーツとして富野氏から依頼されていた」が実現せず「デザインはファイブスターに生かされたんだ」と語られた。"
+        },
+        {
+          q: "劇場アニメ『鉄コン筋クリート』でネズミ役を演じ、その芝居の上手さに二人が驚いていたのは、元は何をやっていた人物だったか？",
+          choices: ["声優一筋のベテラン", "舞踏(踊り)の表現者", "元アイドル", "スタントマン"],
+          correct: 1,
+          explain: "正解は舞踏(踊り)の表現者。「元々ほら、あの踊りの人じゃないですか?」「なんでこんなうまいんだろうって」と、俳優・舞踏家である田中泯の芝居に驚いていた。"
+        },
+        {
+          q: "中村が「ジークアクスはもう後追いですから」と言うきっかけになった、旧作アニメ『キスダム』の先進的だった点は？",
+          choices: ["2〜3話目という早い段階で総集編(振り返り回)をやっていた", "1話目からいきなり最終回を放送していた", "主人公が途中で入れ替わっていた", "メカが最終回まで一切登場しなかった"],
+          correct: 0,
+          explain: "正解は早い段階での総集編。「確か2話目。2話目に総集編」「先取りしてたよ」「言ってみジークアックスはもうもはや後追いですからね」と話題になった。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "永久保存版", line: "隅から隅まで読み込む生粋のオタク魂。" },
+        { min: 4, badge: "付録コンプリート", line: "細部までしっかり記憶していた強者。" },
+        { min: 3, badge: "立ち読みマスター", line: "気になるページはばっちり押さえた。" },
+        { min: 1, badge: "ナナメ読み", line: "ざっくり眺めた程度。次はじっくり読もう。" },
+        { min: 0, badge: "積読行き", line: "残念、記憶の彼方。また読み直そう。" }
+      ]
+    },
+    {
+      id: "nosh-4th-collab-dog-food",
+      number: 66,
+      videoTitle: "【nosh】ナッシュのオススメ大集合！わしらにピッタリの人気メニュー食べてみた【PR】",
+      videoUrl: "https://www.youtube.com/watch?v=KP-q0GXg9UQ",
+      blurb: "低糖質の宅配食nosh(ナッシュ)とのコラボ4回目。人気ランキングメニューやサイトの栄養素ソート機能を紹介しつつ、前回の不満点を受けてついに初公開となったペット用の『ナッシュドッグ』にも挑戦する回。",
+      locked: false,
+      questions: [
+        {
+          q: "今回で何回目のnosh(ナッシュ)案件だと語られていたか？",
+          choices: ["3回目", "4回目", "2回目", "5回目"],
+          correct: 1,
+          explain: "正解は4回目。「4ぐらい」「4回目か」「それでもね、4回だから最多ですよ」と紹介された。"
+        },
+        {
+          q: "中村さんの「ナッシュの人気メニュー」ランキング企画で堂々の1位に選ばれたメニューは？",
+          choices: ["タラフライの特製タルタルソース", "銀ダラのマッシュポテトアヒージョ風", "よだれ鶏", "オニオングリルハンバーグ"],
+          correct: 3,
+          explain: "正解はオニオングリルハンバーグ。「ハイ、堂々1位がオニオングリルハンバーグでございます」「大正義ハンバーグ」と紹介された。"
+        },
+        {
+          q: "梶田さんの「美味しく鍛える男のストイック飯」ランキングで1位だったメニューは？",
+          choices: ["タンパク質チャージ 朝の唐揚げチキン", "たっぷり挽き肉のマーボーナス", "よだれ鶏", "銀ダラのマッシュポテトアヒージョ風"],
+          correct: 0,
+          explain: "正解はタンパク質チャージ 朝の唐揚げチキン。「そして1位がこちら。タンパク質チャージ。朝の唐揚げチキン」と紹介され「ほぼ鳥やね」と言われた。"
+        },
+        {
+          q: "サイトの「糖質が低い順」ソート機能で意外にも上位に来ていた食材は？",
+          choices: ["白米", "玄米麺", "バターロール(パン)", "もち"],
+          correct: 2,
+          explain: "正解はバターロール(パン)。「パ、パンがこんな低いの?」「バターロールが低くできるのね」と驚かれた。"
+        },
+        {
+          q: "前回の不満点を受け、今回ついに初公開されたnosh(ナッシュ)の新ジャンル商品は？",
+          choices: ["ナッシュキッズ(子供向け)", "ナッシュドッグ(ペット用フード)", "ナッシュジム(プロテイン飲料)", "ナッシュベビー(離乳食)"],
+          correct: 1,
+          explain: "正解はナッシュドッグ。「前回ご用意できなかったナッシュドッグでございます」「人間だけじゃなくてペットの領域まで手を出してきました」と紹介された。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "未来の食パートナー確定", line: "冷凍とは思えぬ美味しさを完全に見抜いた舌の持ち主。" },
+        { min: 4, badge: "殿堂入りメニュー", line: "安定感抜群、リピート確実の実力派。" },
+        { min: 3, badge: "ランキング上位", line: "十分満足の当たりメニュー。" },
+        { min: 1, badge: "試食中", line: "まずまずの結果。次のメニューに期待。" },
+        { min: 0, badge: "トレーナーNG", line: "残念、脂質オーバーで却下。また挑戦だ。" }
+      ]
+    },
+    {
+      id: "dq-square-enix-store-haul",
+      number: 67,
+      videoTitle: "【ドラクエ】スクエニストアで大人買い！FF,ロマサガ…高額スライム伝統工芸！？【私物紹介】",
+      videoUrl: "https://www.youtube.com/watch?v=bZi15jsIeIA",
+      blurb: "スクウェア・エニックスストアで届いたドラクエグッズを次々開封し、FFの光るランプやロトの名刺ケース、江戸切子とのコラボグラスまで大人買いの成果を紹介する私物回。",
+      locked: false,
+      questions: [
+        {
+          q: "終盤に開封した、ドラゴンクエストと江戸切子がコラボしたグラス(メタルスライムデザイン)の価格は？",
+          choices: ["16,500円", "33,000円", "66,000円", "98,000円"],
+          correct: 2,
+          explain: "正解は66,000円。マフィア梶田が値段を聞かれて「6万6000円」と答え、中村に「高いとは思ったよ」と言わせるほどの価格だった。"
+        },
+        {
+          q: "このメタルスライムデザインの江戸切子グラス、二人が「一番人気で真っ先に売り切れていた」と話していた色は？",
+          choices: ["黒", "白", "赤", "青"],
+          correct: 3,
+          explain: "正解は青。「絶対青が一番人気あるって」「青、青やっぱ人気っぽい」と話され、実際に青と赤は売り切れで黒だけまだ購入できる状態だった。"
+        },
+        {
+          q: "FFシリーズの光るランプ、暗黒騎士セシルのランプと並べて紹介されていたFF5の主人公のランプは？",
+          choices: ["バッツ", "スコール", "クラウド", "ティーダ"],
+          correct: 0,
+          explain: "正解はバッツ。「これバッツ5からバッツ」「光るバッツじゃないすか」とセシルのランプと横並びで紹介されていた。"
+        },
+        {
+          q: "動画の最後、マフィア梶田が中村悠一に譲った名刺ケースはどちらのデザインだった？",
+          choices: ["ロトの紋章(金色)", "チョコボ柄", "メタルスライム(銀色)", "スライムベス柄"],
+          correct: 2,
+          explain: "正解はメタルスライム(銀色)。中村は「やっぱシルバーかな」「俺身につけてるものが大体シルバー」と述べ、ロトの金色ではなく銀のメタルスライム名刺ケースを選んでもらった。"
+        },
+        {
+          q: "メタルスライムデザインの陶器貯金箱を開封した際、二人が驚いていたポイントは？",
+          choices: ["穴から硬貨を出す仕組みがついていた", "振ると鳴き声のような音が鳴った", "叩き割ると小さなフィギュアが出てきた", "表面が鏡のように反射してスタッフの顔まで映り込んだ"],
+          correct: 3,
+          explain: "正解は「表面が鏡のように反射してスタッフの顔まで映り込んだ」。梶田は「全部映ってるよ。スタッフの顔も」「予想以上のシルバーです」と驚いていた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "はぐれメタル級", line: "滅多に出会えないレア台詞まで聞き逃さなかった伝説の一問一答。" },
+        { min: 4, badge: "メタルスライム級", line: "かなりの高確率で正解を引き当てる、逃がしたくない実力者。" },
+        { min: 3, badge: "スライムベス級", line: "手堅く正解を重ねる頼れる戦力。" },
+        { min: 1, badge: "スライム級", line: "経験値は積めた。次はもう一歩踏み込もう。" },
+        { min: 0, badge: "ドラキー級", line: "最初の一撃、まずはここから積み上げよう。" }
+      ]
+    },
+    {
+      id: "pp-card-idol-vs-grander-musashi",
+      number: 68,
+      videoTitle: "【PPカード】ルール無用の異種バトル開幕！ アイドルVSグランダー武蔵！【開封動画】",
+      videoUrl: "https://www.youtube.com/watch?v=kSOaa0s4F3A",
+      blurb: "駄菓子屋でおなじみだったくじ引き形式の「PPカード」を使い、実写アイドルブロマイドと90年代の釣りアニメ「グランダー武蔵」のシールで無茶なルール解釈のまま異種対戦してみる開封回。",
+      locked: false,
+      questions: [
+        {
+          q: "対戦に使うか一瞬迷った末に「メジャータイトルすぎるかな」という理由でその場で見送られたコンセプトデッキの作品は？",
+          choices: ["少女革命ウテナ", "新世紀エヴァンゲリオン", "美少女戦士セーラームーン", "カードキャプターさくら"],
+          correct: 0,
+          explain: "正解は少女革命ウテナ。「もう1個が、こっちはちょっとメジャータイトルすぎるかな。え、ウテナですね」「うてなはまだコンセプトデッキ見てからやりたい」とその場で見送られた。"
+        },
+        {
+          q: "対戦相手のPPカードの元ネタ「グランダー武蔵」、原作アニメが放送されていたのは西暦何年？",
+          choices: ["1995年", "2001年", "1998年", "2004年"],
+          correct: 2,
+          explain: "正解は1998年。梶田が「だって98年」「俺がコロコロ読んでる頃だもんよ」と話しており、実際に『グランダー武蔵RV』は1998年に放送された。"
+        },
+        {
+          q: "グランダー武蔵ミラクルシール列伝のパックで「ラストワンの当たり」として封入されていたキラカードは、実物のルアーを模した何という商品だった？",
+          choices: ["ギガブレード", "トップクラーケン", "スケルトンミノー", "ペンシルベイト85N"],
+          correct: 3,
+          explain: "正解はペンシルベイト85N。開封直後に「これここに来るってことは要はラストワンの当たりなんのよ。当たりがこのペンシルバイト85N」と紹介されていた。"
+        },
+        {
+          q: "グランダー武蔵で、主人公・武蔵にバス釣りの本当の楽しさを教え、大ピンチのたびに助言をくれる天才アングラーの名前は？",
+          choices: ["カールアマン", "ミラクルジム", "チュエット", "正ぐ"],
+          correct: 1,
+          explain: "正解はミラクルジム。「武蔵のことを何かと面倒を見てくれる天才アングラーで、困ってる時にアドバイスをしてくれる」と紹介され、彼の登場で武蔵たちが強化された。"
+        },
+        {
+          q: "物語のヒロインとして登場した女の子キャラクターの名前は？(最初はカードの文字を「天ちゃん」と読み間違えていた)",
+          choices: ["すぐる", "天ちゃん", "カールアマン", "星山みお"],
+          correct: 3,
+          explain: "正解は星山みお。最初はカードの文字を「天ちゃん」と読み間違えたが、正体は「星山みおちゃん。ヒロインです」と判明した。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "グランダー級", line: "ラストワン賞級の引きで完全制覇。まさに伝説の釣り師。" },
+        { min: 4, badge: "キラルアー級", line: "かなりの当たり運。次のキャストにも期待大。" },
+        { min: 3, badge: "スーパーシャット級", line: "堅実な釣果。十分な手応えあり。" },
+        { min: 1, badge: "ワーム級", line: "型は小さいがちゃんと1匹釣り上げた。" },
+        { min: 0, badge: "ボウズ", line: "今日はアタリなし。次の遠征に期待しよう。" }
+      ]
+    },
+    {
+      id: "2025-year-in-review",
+      number: 69,
+      videoTitle: "【迎春】2025年振り返り！ 去年のわしら なにしてた？【2026】",
+      videoUrl: "https://www.youtube.com/watch?v=bh6As2Ve6vA",
+      blurb: "2025年に投稿した動画を1年分まとめて見返しながら、再生数の伸びたシーンやゲスト回のハイライトをコメントしていく振り返り企画。",
+      locked: false,
+      questions: [
+        {
+          q: "2025年に最初にアップロードされた動画の企画は何だった？",
+          choices: ["ガンダムカルタ", "福袋開封", "抱き枕グッズ紹介", "おみくじチャレンジ"],
+          correct: 0,
+          explain: "正解はガンダムカルタ。「まず昨年の最初の動画から見しました…あけましておめでとうマフィア梶田です」と、お正月らしいガンダムカルタ回から一年を振り返り始めた。"
+        },
+        {
+          q: "2025年、PR(広告)タイアップ動画で「伸びがいい」と話題になった食べ物系コラボは、ナッシュ(冷凍宅配弁当)ともう一つ何だった？",
+          choices: ["ドラゴンボール", "名探偵コナン", "ちいかわ", "進撃の巨人"],
+          correct: 1,
+          explain: "正解は名探偵コナン。「ナッシュにもコナンもさ、そうだしPRって伸びづらいんですけど…食いもん強えんかな」とPR案件でも視聴者の反応が良かったと話していた。"
+        },
+        {
+          q: "名探偵コナンのカード紹介の中で、「食べる時期によって呼び方が変わる」という豆知識で盛り上がったのは、おはぎと何の呼び方の違いについてだった？",
+          choices: ["どら焼きと今川焼き", "こちら葛飾区亀有公園前派出所", "おはぎとぼたもち", "団子とみたらし"],
+          correct: 2,
+          explain: "正解はおはぎとぼたもち。「食べる時。次で変わんの?」「おはぎとぼたもちって違うんか？言い方が違うだけ」と季節で呼び名が変わる豆知識で盛り上がった。"
+        },
+        {
+          q: "VTuberの吹雪さんがゲスト出演した回で、再生数のグラフが特に伸びていたのは、中村が「自分が◯◯に入る」と言った冗談の場面だった。◯◯とは？",
+          choices: ["にじさんじ", "声優事務所", "アイドルグループ", "ホロライブ"],
+          correct: 3,
+          explain: "正解はホロライブ。再生数グラフの伸びていた箇所を確認すると「あ、俺がホライブに入るって話」というくだりで盛り上がっていたことが判明した。"
+        },
+        {
+          q: "名探偵コナンについて話す中で、「もう30年ぐらい続いてる」「来年何周年ですか」と話題になったのは何周年か？",
+          choices: ["20周年", "25周年", "30周年", "35周年"],
+          correct: 2,
+          explain: "正解は30周年。「もう30年ぐらい続いてアニメも来年何周年ですか」「それだけになると国民的な作品になるよな」と長寿シリーズの節目を話題にしていた(アニメ『名探偵コナン』は1996年放送開始で2026年に30周年)。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "完全記憶野郎", line: "1年分の出来事を寸分違わず思い出せる驚異の記憶力。" },
+        { min: 4, badge: "アーカイブ班長", line: "ほぼ完璧に1年を振り返れる頼れる存在。" },
+        { min: 3, badge: "うろ覚え上等", line: "「あ、これやったな」くらいは思い出せるレベル。" },
+        { min: 1, badge: "記憶あいまい", line: "見たはずなのに記憶がだいぶ薄れている。" },
+        { min: 0, badge: "初見さん", line: "もう一度アーカイブから見返してみよう。" }
+      ]
+    },
+    {
+      id: "otaku-osechi-parody-box",
+      number: 70,
+      videoTitle: "【新春】オタクの好きなモノで\"おせち\"作ってみた！？(※食べられません)【2026】",
+      videoUrl: "https://www.youtube.com/watch?v=pQeKQYfZDIo",
+      blurb: "正月のおせち料理に込められた縁起の意味に、ガンダムやエヴァ、聖闘士星矢などオタクコンテンツのキャラクターをダジャレでこじつけて詰めていく、食べられない私物おせち作り企画。",
+      locked: false,
+      questions: [
+        {
+          q: "伝統的なおせちの「伊達巻き」の枠に、二人は「伊達じゃない」というダジャレで何を入れた？",
+          choices: ["ユニコーンガンダム", "Zガンダム", "ニューガンダム", "ガンダムバルバトス"],
+          correct: 2,
+          explain: "正解はニューガンダム。「伊達巻きて言ったらね、ニューガンダムなんですよ」「伊達じゃないのはニューガンダムなんですよ」というダジャレで即決していた。"
+        },
+        {
+          q: "「子孫繁栄」を願う数の子の枠に、ルートによっては「耐えていた」ことにちなんで入れられたキャラクターは？",
+          choices: ["岡部倫太郎", "阿良々木暦", "キョン", "伊藤誠"],
+          correct: 3,
+          explain: "正解は伊藤誠(スクールデイズ)。「スクールデイズの伊藤誠かな?」「ルートによっては耐えてた」というやり取りで数の子の枠に選ばれた。"
+        },
+        {
+          q: "「喜ぶ」にかけた昆布巻きの枠に入れられた、エヴァンゲリオンのキャラクターは？",
+          choices: ["渚カヲル", "綾波レイ", "アスカ・ラングレー", "伊吹マヤ"],
+          correct: 0,
+          explain: "正解は渚カヲル。「スタジオカラーのカラーは喜びって意味…喜びの歌が流れるから」「かおる君入れとこうか」と昆布巻きの枠に選ばれた。"
+        },
+        {
+          q: "「根を張る=長く続く」という願いを込めたごぼうの枠に選ばれた、長期連載で有名な漫画は？",
+          choices: ["ゴルゴ13", "こちら葛飾区亀有公園前派出所", "サザエさん", "ドラえもん"],
+          correct: 1,
+          explain: "正解はこちら葛飾区亀有公園前派出所(こち亀)。「根を張るごぼう…長く続いたってこち亀かな」「こち亀は根を張ったな」という流れでごぼうの枠に決定した。"
+        },
+        {
+          q: "「紅白」をかけたパラソル(傘)の枠に、アンブレラ社つながりで選ばれたバイオハザードのキャラクターは？",
+          choices: ["クリス・レッドフィールド", "レオン・S・ケネディ", "アルバート・ウェスカー", "エイダ・ウォン"],
+          correct: 2,
+          explain: "正解はアルバート・ウェスカー。「パラソルが紅白」「アンブレラ社のパラソルとかけて」「研究員だったんですよね、あいつ」という流れでウェスカーが選ばれた。"
+        }
+      ],
+      ranks: [
+        { min: 5, badge: "一の重", line: "どの枠のダジャレも完璧に把握。まさに主役級の出来栄え。" },
+        { min: 4, badge: "二の重", line: "かなりの完成度。もう一品足せば一の重も狙える。" },
+        { min: 3, badge: "三の重", line: "手堅くまとまった、悪くない仕上がり。" },
+        { min: 1, badge: "与の重", line: "味は薄めだが、ちゃんと箱には収まった。" },
+        { min: 0, badge: "空打ち", line: "今回は現を担げず、また来年の課題に。" }
+      ]
+    },
+    {
+      id: "coming-soon",
+      number: 71,
+      videoTitle: "NEXT FILE",
+      blurb: "新しいエピソードは準備が整い次第、ここに追加していきます。お楽しみに。",
+      locked: true
+    }
+  ];
+
+  const SHARE_URL = "https://claude.ai/code/artifact/dd332956-6b94-4797-9479-a8d8265aca88";
+
+  const appEl = document.getElementById("app");
+  const backBtn = document.getElementById("backBtn");
+  const signoffEl = document.getElementById("signoff");
+
+  const PAGE_SIZE = 20; // episodes per pager page
+  const STORAGE_KEY = "wasyagana-quiz-state-v1";
+
+  let activeEpisode = null;
+  let current = 0;
+  let answers = [];
+  let currentPage = 0;
+
+  function persistState() {
+    try {
+      if (!activeEpisode) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ view: "home", currentPage }));
+      } else if (current >= activeEpisode.questions.length) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ view: "results", episodeId: activeEpisode.id, answers }));
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ view: "quiz", episodeId: activeEpisode.id, current, answers }));
+      }
+    } catch (e) {}
+  }
+
+  function loadPersistedState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const state = JSON.parse(raw);
+      return state && typeof state === "object" ? state : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function restoreView() {
+    const state = loadPersistedState();
+    if (!state) { renderHome(); return; }
+
+    if (state.view === "home") {
+      currentPage = Number.isInteger(state.currentPage) && state.currentPage >= 0 ? state.currentPage : 0;
+      renderHome();
+      return;
+    }
+
+    const ep = EPISODES.find((e) => e.id === state.episodeId && !e.locked);
+    if (!ep || !Array.isArray(state.answers) || state.answers.length !== ep.questions.length) {
+      renderHome();
+      return;
+    }
+
+    activeEpisode = ep;
+    answers = state.answers;
+    backBtn.classList.add("show");
+    signoffEl.textContent = `SOURCE: ${ep.videoTitle}`;
+
+    if (state.view === "results") {
+      current = ep.questions.length;
+      renderResults();
+    } else if (state.view === "quiz" && Number.isInteger(state.current) && state.current >= 0 && state.current < ep.questions.length) {
+      current = state.current;
+      answers[current] = null; // re-render the in-progress question fresh, unanswered
+      renderQuestion();
+    } else {
+      renderHome();
+    }
+  }
+
+  function shareResult(ep, score, rank, btn) {
+    const text = `「わしゃがなTV4択クイズ」\n${ep.videoTitle}\nランク「${rank.badge}」（${score}/${ep.questions.length}問正解）でした！\nあなたも挑戦してみて`;
+
+    if (navigator.share) {
+      navigator.share({ title: "わしゃがなTV4択クイズ", text, url: SHARE_URL }).catch(() => {});
+      return;
+    }
+
+    const tweetUrl = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text + "\n") + "&url=" + encodeURIComponent(SHARE_URL);
+    const opened = window.open(tweetUrl, "_blank", "noopener,noreferrer");
+
+    if (!opened && navigator.clipboard) {
+      navigator.clipboard.writeText(text + "\n" + SHARE_URL).then(() => {
+        if (btn) {
+          const original = btn.textContent;
+          btn.textContent = "コピーしました";
+          setTimeout(() => { btn.textContent = original; }, 2000);
+        }
+      }).catch(() => {});
+    }
+  }
+
+  backBtn.addEventListener("click", renderHome);
+
+  function renderHome() {
+    activeEpisode = null;
+    backBtn.classList.remove("show");
+    signoffEl.textContent = "SOURCE: マフィア梶田と中村悠一の「わしゃがなTV」（@WasyaganaTV）／本アプリは非公式のファンクイズです";
+    appEl.innerHTML = "";
+
+    const lede = document.createElement("p");
+    lede.className = "archive-lede";
+    lede.innerHTML = `「わしゃがなTV」の各回から出題する<b>非公式4択クイズ集</b>。エピソードを選んでスタート。動画が増えるたびに、ここにファイルを追加していきます。`;
+    appEl.appendChild(lede);
+
+    const maxNumber = EPISODES.reduce((max, ep) => Math.max(max, ep.number), 1);
+    const totalPages = Math.max(1, Math.ceil(maxNumber / PAGE_SIZE));
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+    if (currentPage < 0) currentPage = 0;
+
+    if (totalPages > 1) appEl.appendChild(renderPager(totalPages));
+
+    const list = document.createElement("div");
+    list.className = "ep-list";
+
+    const pageEpisodes = EPISODES.filter((ep) => Math.floor((ep.number - 1) / PAGE_SIZE) === currentPage);
+
+    pageEpisodes.forEach((ep) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "ep-card" + (ep.locked ? " locked" : "");
+      card.disabled = !!ep.locked;
+
+      const top = document.createElement("div");
+      top.className = "ep-top";
+      const numEl = document.createElement("span");
+      numEl.className = "ep-num";
+      numEl.textContent = `FILE ${String(ep.number).padStart(3, "0")}`;
+      const badge = document.createElement("span");
+      badge.className = "ep-badge" + (ep.locked ? " locked" : "");
+      badge.textContent = ep.locked ? "近日追加" : `全${ep.questions.length}問`;
+      top.appendChild(numEl);
+      top.appendChild(badge);
+      card.appendChild(top);
+
+      const body = document.createElement("div");
+      body.className = "ep-card-body";
+
+      const textCol = document.createElement("div");
+      textCol.className = "ep-card-text";
+
+      const titleEl = document.createElement("p");
+      titleEl.className = "ep-title";
+      titleEl.textContent = ep.videoTitle;
+      textCol.appendChild(titleEl);
+
+      const blurbEl = document.createElement("p");
+      blurbEl.className = "ep-blurb";
+      blurbEl.textContent = ep.blurb;
+      textCol.appendChild(blurbEl);
+
+      body.appendChild(textCol);
+      card.appendChild(body);
+
+      if (!ep.locked) {
+        card.addEventListener("click", () => startEpisode(ep));
+      }
+      list.appendChild(card);
+    });
+
+    appEl.appendChild(list);
+
+    if (totalPages > 1) appEl.appendChild(renderPager(totalPages));
+
+    persistState();
+  }
+
+  function renderPager(totalPages) {
+    const pager = document.createElement("div");
+    pager.className = "pager";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.type = "button";
+    prevBtn.className = "pager-btn pager-arrow";
+    prevBtn.textContent = "◀";
+    prevBtn.disabled = currentPage === 0;
+    prevBtn.addEventListener("click", () => { currentPage--; renderHome(); window.scrollTo(0, 0); });
+    pager.appendChild(prevBtn);
+
+    for (let i = 0; i < totalPages; i++) {
+      const startNum = i * PAGE_SIZE + 1;
+      const endNum = (i + 1) * PAGE_SIZE;
+      const pageBtn = document.createElement("button");
+      pageBtn.type = "button";
+      pageBtn.className = "pager-btn" + (i === currentPage ? " active" : "");
+      pageBtn.textContent = `FILE${String(startNum).padStart(3, "0")}-${String(endNum).padStart(3, "0")}`;
+      pageBtn.addEventListener("click", () => { currentPage = i; renderHome(); window.scrollTo(0, 0); });
+      pager.appendChild(pageBtn);
+    }
+
+    const nextBtn = document.createElement("button");
+    nextBtn.type = "button";
+    nextBtn.className = "pager-btn pager-arrow";
+    nextBtn.textContent = "▶";
+    nextBtn.disabled = currentPage === totalPages - 1;
+    nextBtn.addEventListener("click", () => { currentPage++; renderHome(); window.scrollTo(0, 0); });
+    pager.appendChild(nextBtn);
+
+    return pager;
+  }
+
+  function startEpisode(ep) {
+    activeEpisode = ep;
+    current = 0;
+    answers = new Array(ep.questions.length).fill(null);
+    backBtn.classList.add("show");
+    signoffEl.textContent = `SOURCE: ${ep.videoTitle}`;
+    renderQuestion();
+  }
+
+  function renderGauge(container) {
+    const gauge = document.createElement("div");
+    gauge.className = "gauge";
+    activeEpisode.questions.forEach((_, i) => {
+      const seg = document.createElement("i");
+      if (i < current) seg.classList.add("done");
+      else if (i === current) seg.classList.add("current");
+      gauge.appendChild(seg);
+    });
+    container.appendChild(gauge);
+    return gauge;
+  }
+
+  function renderQuestion() {
+    const ep = activeEpisode;
+    const data = ep.questions[current];
+    appEl.innerHTML = "";
+
+    if (current === 0) {
+      const titleRow = document.createElement("div");
+      titleRow.className = "quiz-title-row";
+      const titleText = document.createElement("div");
+      titleText.className = "quiz-title-text";
+      titleText.innerHTML = `<div class="quiz-eyebrow">FILE ${String(ep.number).padStart(3, "0")}</div><h2 class="quiz-title">${ep.videoTitle}</h2>`;
+      titleRow.appendChild(titleText);
+      appEl.appendChild(titleRow);
+      if (ep.briefing) {
+        const briefing = document.createElement("p");
+        briefing.className = "archive-lede";
+        briefing.textContent = ep.briefing;
+        appEl.appendChild(briefing);
+      }
+    }
+
+    const gauge = renderGauge(appEl);
+
+    const tag = document.createElement("div");
+    tag.className = "q-tag";
+    tag.innerHTML = `QUESTION ${String(current + 1).padStart(2, "0")} <span>/ ${String(ep.questions.length).padStart(2, "0")}</span>`;
+    appEl.appendChild(tag);
+
+    const qText = document.createElement("p");
+    qText.className = "q-text";
+    qText.textContent = data.q;
+    appEl.appendChild(qText);
+
+    const choicesEl = document.createElement("div");
+    choicesEl.className = "choices";
+    const letters = ["A", "B", "C", "D"];
+
+    data.choices.forEach((choiceText, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "choice";
+      btn.innerHTML = `<span class="mark">${letters[idx]}</span><span>${choiceText}</span>`;
+      btn.addEventListener("click", () => selectAnswer(idx, choicesEl, explainEl, nextBtn, gauge));
+      choicesEl.appendChild(btn);
+    });
+    appEl.appendChild(choicesEl);
+
+    const explainEl = document.createElement("div");
+    explainEl.className = "explain";
+    explainEl.innerHTML = `<span class="label">DATA LOG</span>${data.explain}`;
+    appEl.appendChild(explainEl);
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "next-btn";
+    nextBtn.textContent = current === ep.questions.length - 1 ? "検査結果を見る ▶" : "次の設問へ ▶";
+    nextBtn.addEventListener("click", () => {
+      current++;
+      if (current < ep.questions.length) renderQuestion();
+      else renderResults();
+    });
+    appEl.appendChild(nextBtn);
+
+    persistState();
+  }
+
+  function selectAnswer(idx, choicesEl, explainEl, nextBtn, gauge) {
+    if (answers[current] !== null) return;
+    answers[current] = idx;
+    const data = activeEpisode.questions[current];
+    const buttons = choicesEl.querySelectorAll(".choice");
+
+    buttons.forEach((b, i) => {
+      b.classList.add("disabled");
+      if (i === data.correct) {
+        b.classList.add("correct");
+        b.insertAdjacentHTML("beforeend", '<span class="result-icon">正解</span>');
+      } else if (i === idx) {
+        b.classList.add("wrong");
+        b.insertAdjacentHTML("beforeend", '<span class="result-icon">不正解</span>');
+      } else {
+        b.classList.add("dim");
+      }
+      b.onclick = null;
+    });
+
+    explainEl.classList.add("show");
+    nextBtn.classList.add("show");
+    const seg = gauge.children[current];
+    if (seg) { seg.classList.remove("current"); seg.classList.add("done"); }
+
+    persistState();
+  }
+
+  function renderResults() {
+    const ep = activeEpisode;
+    const score = answers.reduce((acc, a, i) => acc + (a === ep.questions[i].correct ? 1 : 0), 0);
+    const rank = ep.ranks.find(r => score >= r.min);
+
+    appEl.innerHTML = "";
+    renderGauge(appEl);
+
+    const wrap = document.createElement("div");
+    wrap.className = "results";
+
+    const rankRow = document.createElement("div");
+    rankRow.className = "rank-row";
+    rankRow.innerHTML = `<span class="rank-badge">${rank.badge}</span><span class="rank-score">SCORE ${score} / ${ep.questions.length}</span>`;
+    wrap.appendChild(rankRow);
+
+    const rankLine = document.createElement("p");
+    rankLine.className = "rank-line";
+    rankLine.textContent = rank.line;
+    wrap.appendChild(rankLine);
+
+    const recap = document.createElement("div");
+    recap.className = "recap";
+    ep.questions.forEach((data, i) => {
+      const ok = answers[i] === data.correct;
+      const item = document.createElement("div");
+      item.className = "recap-item " + (ok ? "ok" : "ng");
+      item.innerHTML = `<span class="r-mark">${ok ? "○" : "×"}</span><span>Q${i + 1}. <b>${data.q}</b><br>正解：${data.choices[data.correct]}</span>`;
+      recap.appendChild(item);
+    });
+    wrap.appendChild(recap);
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const shareBtn = document.createElement("button");
+    shareBtn.className = "btn btn-primary";
+    shareBtn.textContent = "結果をシェアする ▶";
+    shareBtn.addEventListener("click", () => shareResult(ep, score, rank, shareBtn));
+    actions.appendChild(shareBtn);
+
+    const retryBtn = document.createElement("button");
+    retryBtn.className = "btn btn-ghost";
+    retryBtn.textContent = "もう一度挑戦する";
+    retryBtn.addEventListener("click", () => startEpisode(ep));
+    actions.appendChild(retryBtn);
+
+    if (ep.videoUrl) {
+      const videoLink = document.createElement("a");
+      videoLink.className = "btn btn-ghost";
+      videoLink.href = ep.videoUrl;
+      videoLink.target = "_blank";
+      videoLink.rel = "noopener noreferrer";
+      videoLink.textContent = "元動画を見る ▶";
+      actions.appendChild(videoLink);
+    }
+
+    const homeBtn = document.createElement("button");
+    homeBtn.className = "btn btn-ghost";
+    homeBtn.textContent = "アーカイブに戻る";
+    homeBtn.addEventListener("click", renderHome);
+    actions.appendChild(homeBtn);
+
+    wrap.appendChild(actions);
+    appEl.appendChild(wrap);
+
+    persistState();
+  }
+
+  restoreView();
+</script>
+</body>
+</html>
