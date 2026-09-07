@@ -6329,43 +6329,16 @@
   }
 
   function restoreView() {
+    // ページ読み込み時（リンクを開いた時）は常にホーム（タイトル一覧）を表示する。
+    // クイズ・結果・履歴の途中状態は復元しない。並び順・ページ・検索語の
+    // 好みだけはホーム表示の一部として引き継ぐ。
     const state = loadPersistedState();
-    if (!state) { renderHome(); return; }
-
-    if (state.view === "home") {
+    if (state && state.view === "home") {
       currentPage = Number.isInteger(state.currentPage) && state.currentPage >= 0 ? state.currentPage : 0;
       sortOrder = state.sortOrder === "desc" ? "desc" : "asc";
       searchQuery = typeof state.searchQuery === "string" ? state.searchQuery : "";
-      renderHome();
-      return;
     }
-
-    if (state.view === "history") {
-      renderHistoryPage();
-      return;
-    }
-
-    const ep = EPISODES.find((e) => e.id === state.episodeId && !e.locked);
-    if (!ep || !Array.isArray(state.answers) || state.answers.length !== ep.questions.length) {
-      renderHome();
-      return;
-    }
-
-    activeEpisode = ep;
-    answers = state.answers;
-    backBtn.classList.add("show");
-    signoffEl.textContent = `SOURCE: ${ep.videoTitle}`;
-
-    if (state.view === "results") {
-      current = ep.questions.length;
-      renderResults();
-    } else if (state.view === "quiz" && Number.isInteger(state.current) && state.current >= 0 && state.current < ep.questions.length) {
-      current = state.current;
-      answers[current] = null; // re-render the in-progress question fresh, unanswered
-      renderQuestion();
-    } else {
-      renderHome();
-    }
+    renderHome();
   }
 
   function shareResult(ep, score, rank, btn) {
